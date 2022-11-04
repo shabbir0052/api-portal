@@ -1,0 +1,267 @@
+openapi: 3.0.1
+info:
+    title: Adjuster Supervise info
+    version: 1.0-draft
+    description: Claim Adjuster  Supervisor
+
+servers:
+    - url: "https://api-dev.n01.csaa-insurance.aaa.com/{basePath}"
+      description: DEV
+      variables:
+          basePath:
+              default: v2-claims
+    - url: "https://api-qa.n01.csaa-insurance.aaa.com/{basePath}"
+      description: QA
+      variables:
+          basePath:
+              default: v2-claims
+    - url: "https://api-e2e.n01.csaa-insurance.aaa.com/{basePath}"
+      description: E2E
+      variables:
+          basePath:
+              default: v2-claims
+    - url: "https://api-perf.n01.csaa-insurance.aaa.com/{basePath}"
+      description: PERF
+      variables:
+          basePath:
+              default: v2-claims
+    - url: "https://api-stage.p01.csaa-insurance.aaa.com/{basePath}"
+      description: STAGE
+      variables:
+          basePath:
+              default: v2-claims
+    - url: "https://api.p01.csaa-insurance.aaa.com/{basePath}"
+      description: PROD
+      variables:
+          basePath:
+              default: v2-claims
+paths:
+    "/api/v2/claims/adjuster/supervisor":
+        get:
+            tags:
+                - Ajuster
+            parameters:
+                - name: x-api-key
+                  description: Unique api key for each consumer
+                  schema:
+                      type: string
+                      example: 4xyz78b9-0cdc
+                  in: header
+                  required: true
+                - name: backEnd_env
+                  description: Back end envinment
+                  schema:
+                      type: string
+                      example: qa1
+                  in: query
+                  required: false
+                - name: X-ApplicationContext
+                  description: Application context
+                  schema:
+                      $ref: "#/components/schemas/applicationContext"
+                  in: header
+                  required: true
+                - name: email_id
+                  description: Unique identifier for a billing resource
+                  schema:
+                      type: string
+                      example: 'john.doe@@contoso.com'
+                  in: query
+                  required: true
+            responses:
+                "200":
+                    headers:
+                        X-ApplicationContext:
+                            schema:
+                                $ref: "#/components/schemas/applicationContext"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AdjusterSurpervisorInfo"
+                    description: 200 response
+                "400":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 400 response
+                "401":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 401 response
+                "403":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 403 response
+                "409":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 409 response
+                "422":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 422 response
+                "500":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 500 response
+            security:
+                - csaaapihubV2BillingsAPIoktaAuthorizer: []
+            operationId: getBillingSummary
+            summary: Supervisor details
+            description: >-
+                This method will provide the supervisor details , with current version on supervisor email
+
+    "/api/v2/claims/adjuster/supervisor/health":
+        get:
+            tags:
+                - Ajuster
+            parameters:
+                - name: x-api-key
+                  description: Unique api key for each consumer
+                  schema:
+                      type: string
+                      example: 4xyz78b9-0cdc
+                  in: header
+                  required: true
+                - name: X-ApplicationContext
+                  description: Application context
+                  schema:
+                      $ref: "#/components/schemas/applicationContext"
+                  in: header
+                  required: true
+            responses:
+                "200":
+                    headers:
+                        correlationId:
+                            schema:
+                                type: string
+                    content:
+                        application/json: {}
+                    description: 200 response
+                "400":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 400 response
+                "401":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 401 response
+                "500":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/fault"
+                    description: 500 response
+            security:
+                - csaaapihubV2BillingsAPIoktaAuthorizer: []
+            summary: Health check endpoint
+            description: Health check endpoint
+
+components:
+    schemas:
+        AdjusterSurpervisorInfo:
+            description: Supervisor info
+            type: object
+            properties:
+                emailID:
+                    maxLength: 100
+                    pattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+                    type: string
+                    example: 'smith.clark@contoso.com'
+
+        applicationContext:
+            description: Application context
+            required:
+                - application
+                - correlationId
+            type: object
+            properties:
+                userId:
+                    description: Requester Userid
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,20}$'
+                    type: string
+                    example: es0t
+                application:
+                    description: >-
+                        Unique partner ID of the consumer application. This will be provided
+                        while the partners are setup. Some of the valid values can be
+                        Assurance, Zebra, Bolt
+                    pattern: "^[a-zA-Z0-9.-_]{2,30}$"
+                    type: string
+                    example: Payment
+                correlationId:
+                    format: uuid
+                    description: Unique Id for the transaction UUID
+                    type: string
+                    example: f94e54f8-50a6-43e3-9c2a-c2c60b13b14d
+                subSystem:
+                    description: Indicates the consumer subsystem
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                    type: string
+                    example: issuepayment
+                address:
+                    description: IP address of the caller
+                    pattern: "^[0-9.]{0,40}$"
+                    type: string
+                    example: 172.29.143.200
+            additionalProperties: false
+
+        fault:
+            description: Error Response from API
+            required:
+                - message
+            type: object
+            properties:
+                message:
+                    description: generic error message description.
+                    type: string
+                errors:
+                    type: array
+                    items:
+                        properties:
+                            messageCode:
+                                description: error code
+                                pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                                type: string
+                            messageDescription:
+                                description: Error message in detail.
+                                pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                                type: string
+                            relatedAttribute:
+                                description: >-
+                                    attribute name that needs to be corrected in order to avoid the validation
+                                    error.
+                                pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                                type: string
+                            providerErrorCode:
+                                description: error code from provider.
+                                pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                                type: string
+            additionalProperties: false
+
+    securitySchemes:
+        csaaapihubV2BillingsAPIoktaAuthorizer:
+            type: apiKey
+            name: Authorization
+            in: header
+            x-amazon-apigateway-authtype: custom
+            x-amazon-apigateway-authorizer:
+                authorizerUri: ""
+                authorizerResultTtlInSeconds: 300
+                identityValidationExpression: Bearer.*
+                type: token
