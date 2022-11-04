@@ -1,0 +1,2626 @@
+openapi: 3.0.1
+info:
+    title: One AAA Experience property quote API
+    version: '1.33.0'
+    description: 'This API enables generating a quote for a property for one AAA. This API is built for B2B partners consumption.  A mapping spec that contains mandatory/optional parameters, enumerations and any specific rules that the consumers need to be aware of, will be supplemented for further readability of this API. This API will provide a premium based on the information provided.
+    <br>
+    <br>
+      <u><b>Way to invoke the API</b></u>
+    <br>
+       1. Invoke security token API with relevant client id and client secret for authorization token. As a best practice, it is suggested to cache the authorization token at the client end till the token expires. Token expiry can be found at "expires_in" attribute of the token API response. "expires_in" is in milliseconds. 
+    <br> 2. Use the authorization token as the bearer token to invoke the quote API with relevant payload. Expired token usage will result in 401.</br> 3. To invoke the API, a minimum of TLSv1.2 protocol has to be used. '
+    
+servers:
+    -   url: 'https://api-adc1.n01.csaa-insurance.aaa.com/{basePath}'
+        variables:
+            basePath:
+                default: adc-homequote
+paths:
+    /home/v1/quotes:
+        post:
+            summary:  This API is used for creating a quick property quote or complete property quote.
+            description:  The quickType attribute is used for determining if the transaction is for quick quote or complete quote. Currently this API supports quick quote only.
+            tags:
+              - OneAAA experience property
+            operationId: createPropertyQuote
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HomeQuoteRequest'
+                required: true
+            parameters:
+                -   name: x-api-key
+                    description: Unique api key for each consumer
+                    schema:
+                        type: string
+                        example: 4xyz78b9-0cdc
+                    in: header
+                    required: true
+            responses:
+                '201':
+                    headers:
+                        correlationId:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HomeQuoteResponse'
+                    description: 200 response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 response
+                '401':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 401 response
+                '403':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 403 response
+                '409':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 409 response
+                '422':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 422 response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 500 response
+            x-amazon-apigateway-request-validator: 'Validate body, query string parameters, and headers'
+            x-amazon-apigateway-integration: {}  
+    /home/v1/quotes/{id}:
+        put:
+            summary:  This API is used for updating/completing/binding a previously created property quote.
+            description:  The quickType attribute is used for determining if the transaction is for update quote or complete quote.
+            operationId: updatePropertyQuote
+            tags:
+              - OneAAA experience property
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HomeQuoteRequest'
+                required: true
+            parameters:
+                -   name: x-api-key
+                    description: Unique api key for each consumer
+                    schema:
+                        type: string
+                        example: 4xyz78b9-0cdc
+                    in: header
+                    required: true
+                -   name: id
+                    description: Unique quote number that requires updating
+                    schema:
+                        type: string
+                        example: qte1234567890
+                    in: path
+                    required: true
+            responses:
+                '200':
+                    headers:
+                        correlationId:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HomeQuoteResponse'
+                    description: 200 response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 response
+                '401':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 401 response
+                '403':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 403 response
+                '404':
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/Fault'
+                  description: 404 response
+                '409':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 409 response
+                '422':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 422 response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 500 response
+            x-amazon-apigateway-request-validator: 'Validate body, query string parameters, and headers'
+            x-amazon-apigateway-integration:    
+        get:
+            summary:  This API is used for retrieving an existing property quote based on quote number.
+            operationId: retrievePropertyQuote
+            tags:
+              - OneAAA experience property
+            parameters:
+                -   name: x-api-key
+                    description: Unique api key for each consumer
+                    schema:
+                        type: string
+                        example: 4xyz78b9-0cdc
+                    in: header
+                    required: true
+                -   name: id
+                    description: Unique quote number that requires updating
+                    schema:
+                        type: string
+                        example: qte1234567890
+                    in: path
+                    required: true
+            responses:
+                '200':
+                    headers:
+                        correlationId:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HomeQuoteResponse'
+                    description: 200 response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 response
+                '401':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 401 response
+                '403':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 403 response
+                '404':
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/Fault'
+                  description: 404 response      
+                '409':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 409 response
+                '422':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 422 response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 500 response
+            x-amazon-apigateway-request-validator: 'Validate body, query string parameters, and headers'
+            x-amazon-apigateway-integration:    
+    /home/v1/quotes/{id}/complete:
+      put:
+        summary: This API is used for completing a previously created property quote.
+        description: This API is used for completing a previously created/updated property quote.
+        operationId: completePropertyQuote
+        tags:
+          - OneAAA experience property
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/completePropertyQuoteRequest'
+          required: true
+        parameters:
+          - name: x-api-key
+            description: Unique api key for each consumer
+            schema:
+              type: string
+              example: 4xyz78b9-0cdc
+            in: header
+            required: true
+          - name: id
+            description: Unique quote number that requires updating
+            schema:
+              type: string
+              example: qte123456789
+            in: path
+            required: true
+        responses:
+          '200':
+            headers:
+              correlationId:
+                schema:
+                  type: string
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/HomeQuoteResponse'
+            description: 200 response
+          '400':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 400 response
+          '401':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 401 response
+          '403':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 403 response
+          '404':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 404 response
+          '409':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 409 response
+          '422':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 422 response
+          '500':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 500 response
+        x-amazon-apigateway-request-validator: 'Validate body, query string parameters, and headers'
+        x-amazon-apigateway-integration: {}
+    /home/v1/quotes/{id}/issue - deprecated:
+      post:
+        summary: 'This API is used for binding/issuing a previously created property quote.'
+        description: This API is used for binding/issuing a previously created property quote. 
+        operationId: IssuePropertyPolicy
+        tags:
+          - OneAAA experience property
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuePropertyPolicyRequest'
+          required: true
+        parameters:
+          - name: x-api-key
+            description: Unique api key for each consumer
+            schema:
+              type: string
+              example: 4xyz78b9-0cdc
+            in: header
+            required: true
+          - name: id
+            description: Unique quote number that requires updating
+            schema:
+              type: string
+              example: qte123456789
+            in: path
+            required: true
+        responses:
+          '200':
+            headers:
+              correlationId:
+                schema:
+                  type: string
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/HomeQuoteResponse'
+            description: 200 response
+          '400':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 400 response
+          '401':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 401 response
+          '403':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 403 response
+          '404':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 404 response
+          '409':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 409 response
+          '422':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 422 response
+          '500':
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Fault'
+            description: 500 response
+        x-amazon-apigateway-request-validator: 'Validate body, query string parameters, and headers'
+        x-amazon-apigateway-integration: {}
+    /home/v1/quotes/health:
+        get:
+            summary: Home quote API health check
+            description: Health check API for home quote 
+            tags:
+                - OneAAA experience property
+            responses:
+                '200':
+                    description: Success
+components:
+    schemas:
+        HomeQuoteRequest:
+            description: This component provides definition of home quote entity
+            additionalProperties: false
+            type: object
+            required:
+                - metaData
+                - consents
+                - riskState
+            properties:
+                metaData:
+                    $ref: '#/components/schemas/requestHeader'
+                autoPaySelected:
+                    $ref: '#/components/schemas/autoPaySelected'
+                bundleType:
+                  $ref: '#/components/schemas/packageType'
+                effectiveDate:
+                    $ref: '#/components/schemas/effectiveDate'
+                orderInsuranceScore:
+                    $ref: '#/components/schemas/orderInsuranceScore'
+                extraOrdinaryLifeCircumstance:
+                    $ref: '#/components/schemas/extraOrdinaryLifeCircumstance'
+                packageSelection:
+                    $ref: '#/components/schemas/packageSelection'
+                paperlessIndicator:
+                    $ref: '#/components/schemas/paperlessIndicator'
+                paymentPlan:
+                    $ref: '#/components/schemas/paymentPlan'
+                policyTerm:
+                    $ref: '#/components/schemas/policyTerm'
+                postalCode:
+                    $ref: '#/components/schemas/postalCode'
+                productCode:
+                    $ref: '#/components/schemas/productCode'
+                productFamilyCode:
+                    $ref: '#/components/schemas/productFamilyCode'
+                productGroupCode:
+                    $ref: '#/components/schemas/productGroupCode'
+                quoteNumber:
+                    $ref: '#/components/schemas/quoteNumber'
+                riskState:
+                    $ref: '#/components/schemas/riskState'
+                additionalInsureds:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/additionalInsured'
+                additionalInterests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/additionalInterest'
+                certificateHolders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/certificateHolder'
+                consents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/consent'
+                currentCarrier:
+                    $ref: '#/components/schemas/CurrentCarrier'
+                endorsements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/endorsements'
+                existingAAAPolicies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExistingPolicies'
+                insureds:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/persons'
+                losses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/losses'
+                mortgagee:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/mortgagee'
+                partnerMemberships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/MembershipInfo'
+                primaryInsuredContactInfo:
+                    $ref: '#/components/schemas/Contact'
+                producer:
+                    $ref: '#/components/schemas/producer'
+                propertyDetails:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/propertyDetails'
+                provider:
+                  $ref: '#/components/schemas/provider'
+                reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/report'
+                thirdPartyDesignee:
+                  $ref: '#/components/schemas/thirdPartyDesignee'
+                questions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/questionsSet'
+        HomeQuoteResponse:
+            description: This component provides definition of home quote entity.
+            additionalProperties: false
+            type: object
+            properties:
+                id:
+                  type: string
+                  description: provides the resource identifier that uniquely identifies the resourse. In this case, this id will carry the quote number from the quote engine.
+                messages:
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/status'
+                metaData:
+                    $ref: '#/components/schemas/requestHeader'
+                autoPaySelected:
+                    $ref: '#/components/schemas/autoPaySelected'
+                bundleType:
+                  $ref: '#/components/schemas/packageType'
+                effectiveDate:
+                    $ref: '#/components/schemas/effectiveDate'
+                expirationDate:
+                  $ref: '#/components/schemas/expirationDate'
+                orderInsuranceScore:
+                    $ref: '#/components/schemas/orderInsuranceScore'
+                extraOrdinaryLifeCircumstance:
+                    $ref: '#/components/schemas/extraOrdinaryLifeCircumstance'
+                packageSelection:
+                    $ref: '#/components/schemas/packageSelection'
+                paperlessIndicator:
+                    $ref: '#/components/schemas/paperlessIndicator'
+                policyNumber:
+                  $ref: '#/components/schemas/policyNumber'
+                policyTerm:
+                    $ref: '#/components/schemas/policyTerm'
+                postalCode:
+                    $ref: '#/components/schemas/postalCode'
+                productFamilyCode:
+                    $ref: '#/components/schemas/productFamilyCode'
+                productGroupCode:
+                    $ref: '#/components/schemas/productGroupCode'
+                productCode:
+                    $ref: '#/components/schemas/productCode'
+                quoteNumber:
+                    $ref: '#/components/schemas/quoteNumber'
+                riskState:
+                    $ref: '#/components/schemas/riskState'
+                additionalInsureds:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/additionalInsured'
+                additionalInterests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/additionalInterest'
+                certificateHolders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/certificateHolder'
+                consents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/consent'
+                currentCarrier:
+                    $ref: '#/components/schemas/CurrentCarrier'
+                discounts:
+                  $ref: '#/components/schemas/discounts'
+                prebindDocument:
+                  description: Additional information is a place holder to add any adhoc features without impacting the existing customers.
+                  type: object
+                  $ref: '#/components/schemas/prebindDocument'
+                endorsements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/endorsements'
+                existingAAAPolicies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExistingPolicies'
+                insureds:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/persons'
+                losses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/losses'
+                miscellaneousFees:
+                  $ref: '#/components/schemas/miscellaneousFees'  
+                mortgagee:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/mortgagee'
+                partnerMemberships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/MembershipInfo'
+                premiums:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/premiums'
+                primaryInsuredContactInfo:
+                    $ref: '#/components/schemas/Contact'
+                producer:
+                    $ref: '#/components/schemas/producer'
+                propertyDetails:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/propertyDetails'
+                provider:
+                  $ref: '#/components/schemas/provider'
+                reports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/report'
+                thirdPartyDesignee:
+                  $ref: '#/components/schemas/thirdPartyDesignee'
+                questions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/questionsSet'
+        Contact:
+            description: ' Contact Information of Primary Insured'
+            additionalProperties: false
+            required:
+                - name
+                - emails
+                - phones
+                - addresses
+            type: object
+            properties:
+                addresses:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Address'
+                addressIndicator:
+                    description: other Address related Questions
+                    additionalProperties: false
+                    type: object
+                    properties:
+                        lengthOfStay:
+                            description: 'Length of stay at an address in years. if less than a year, indicate as 0. if less than three years, then priorAddressIndicator needs to be passed as true and prior address segment need to be populated.'
+                            type: number
+                            example: 18
+                            pattern: '^[0-9]{1,2}$'
+                        moveInDate:
+                            description: ' Date insured moved into prior house YYYY-MM-DD'
+                            type: string
+                            pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                            example: '2017-11-21'
+                emails:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/emails'
+                isRetirementCommunity:
+                  description: Indicates whether the residential address is in a retirement Community. This is applicable only to Arizona.
+                  type: boolean
+                name:
+                    $ref: '#/components/schemas/Name'
+                phones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/phones'
+                preference:
+                  $ref: '#/components/schemas/preference'
+        status:
+            description: ' Provides validation messges from the backend system'
+            additionalProperties: false
+            type: object
+            properties:
+                messageCode:
+                    description: Response message code.
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                messageDescription:
+                    description: Response message description
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,100}$'
+                messageType:
+                  type: string
+                  description: message category.
+                  pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                relatedAttribute:  
+                  type: string
+                  description: attribute name that needs to be corrected in order to avoid the validation error.
+                  pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+        PaymentOption:
+          description: 'Payment Options'
+          additionalProperties: false
+          type: object
+          properties:
+            autoPaySelected:
+                $ref: '#/components/schemas/autoPaySelected'
+            discountPercentage:
+              description: 'Discount provided in percentage'
+              type: number
+              example: 10
+              pattern: '^[0-9]*$'
+            downPayment:
+              $ref: '#/components/schemas/downPayment'
+            downPaymentFee:
+              description: 'Down payment fee including any taxes that needs to be applied against down payment'
+              type: number
+              example: 100
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+            totalDownPayment:
+              description: 'Total down payment including any one time fee and downpayment'
+              type: number
+              example: 100
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+            downPaymentPct:
+              description: Down payment Percentage
+              type: string
+              example: 100
+              pattern: '^[0-9]*$'
+            installmentAmount:
+              description: 'Installment amount'
+              type: number
+              example: 100
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+            installmentFee:
+              description: Installment fee that needs to be applied against every installment
+              type: number
+              example: 100
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+            installmentDueDate:
+              description: Installment due date. This will be populated only in the issue policy response.
+              type: string
+              pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+              example: '2029-03-14'
+            methodOfPayment:
+              $ref: '#/components/schemas/methodOfPayment'
+            numberOfInstallments:
+              description: 'Number of insallments to be made'
+              type: number
+              example: 12
+              pattern: '^[0-9]*$'
+            paymentPlan:
+                $ref: '#/components/schemas/paymentPlan'
+            payPlanPremiumAmount:
+              description: 'Premium associated with the payment plan'
+              type: number
+              example: 1200
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+            totalPremiumAmount:
+              $ref: '#/components/schemas/totalPremiumAmount'
+        Name:
+            description: 'Person Name '
+            additionalProperties: false
+            required:
+                - firstName
+                - lastName
+            type: object
+            properties:
+                firstName:
+                    description: First Name
+                    maxLength: 40
+                    type: string
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                    example: John
+                givenName:
+                    description: Nick Name
+                    maxLength: 40
+                    type: string
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                    example: Sue
+                lastName:
+                    description: Last Name
+                    maxLength: 40
+                    type: string
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                    example: Smith
+                middleName:
+                    description: Middle Name
+                    maxLength: 40
+                    type: string
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                    example: M
+                suffix:
+                    description: suffix
+                    maxLength: 40
+                    enum:
+                        - JR
+                        - SR
+                        - I
+                        - II
+                        - III
+                        - IV
+                        - V
+                        - VI
+                    type: string
+                    example: JR
+                title:
+                    description: 'title '
+                    maxLength: 40
+                    type: string
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                    example: Ms
+        Address:
+            description: Address Object
+            additionalProperties: false
+            required:
+                - addressTypeCode
+                - addressLine1
+                - city
+                - stateProvCode
+                - postalCode
+            type: object
+            properties:
+                addressLine1:
+                    type: string
+                    example: 123 Main st
+                    pattern: '^[A-Z a-z 0-9 \/\\(),.#$%*&0-9]{0,100}$'
+                    maxLength: 100
+                addressLine2:
+                    type: string
+                    pattern: '^[A-Z a-z 0-9 \/\\(),.#$%*&0-9]{0,100}$'
+                    example: Apt23
+                    maxLength: 100
+                addressTypeCode:
+                    enum:
+                        - Mailing
+                        - Billing
+                        - Residential
+                        - Prior
+                        - Business
+                        - Garaging
+                    type: string
+                    example: 'Mailing'
+                addressValidated:
+                    description: if the address is validated by partner
+                    default: false
+                    type: boolean
+                    example: true
+                city:
+                    type: string
+                    pattern: '^[A-Z a-z]{0,40}$'
+                    example: Phoenix
+                countryCode:
+                    type: string
+                    pattern: '^[A-Z a-z]{2,3}$'
+                    example: US
+                county:
+                    type: string
+                    pattern: '^[A-Z a-z 0-9]{0,40}$'
+                    example: Maricopa
+                postalCode:
+                    $ref: '#/components/schemas/postalCode'
+                stateProvCode:
+                    maxLength: 2
+                    type: string
+                    pattern: '^[A-Z a-z]{2}$'
+                    example: AZ
+        MembershipInfo:
+            description: MembershipInformation
+            additionalProperties: false
+            required:
+                - membershipName
+                - membershipNumber
+            type: object
+            properties:
+                membershipName:
+                    enum:
+                        - AAA
+                    type: string
+                    example: AAA
+                membershipNumber:
+                    type: string
+                    example: 1234567890-05
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                membershipPlan:
+                    description: Membsership Plan classic/gold/platinum
+                    type: string
+                    example: Classic
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                membershipSince:
+                    description: Membership Since
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                    type: string
+                    example: '1980-12-30'
+                membershipTotalYears:
+                    description: Total years of Membership
+                    example: '2'
+                    pattern: '^[0-9]{1,2}$'
+                    type: number
+        ExistingPolicies:
+            description: Existing AAA Policies
+            additionalProperties: false
+            type: object
+            properties:
+                productType:
+                  $ref: '#/components/schemas/productType'
+                yearsWithContinuousAutoInsurance:
+                  description: Years of Continuous Auto Insurance 
+                  type: number
+                  pattern: '^[0-9]{0,3}$'
+                autoQuoteRef:
+                  description: Reference to an auto quote that is pending. It can be a policy number or quote number
+                  type: string
+                  pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+        losses:
+            description: Provides details on the any losses or claims on any of the residences
+            additionalProperties: false
+            type: object
+            properties:
+                catastropheLossIndicator:
+                    description: Indicates whether the loss is a catastrophe related one.
+                    type: boolean
+                    example: false
+                claimSettledIndicator:
+                    description: Indicates whether the claim is settled.
+                    type: boolean
+                    example: false
+                claimStatusCode:
+                    description: Status code of the claim.
+                    type: string
+                    enum:
+                      - 'Open'
+                      - 'Closed'
+                      - 'Subrogation'
+                      - 'Under Deductible'
+                      - 'Peril Not covered '
+                      - 'Withdrawn'
+                locationCode:
+                    description: Loss location code.
+                    type: string
+                    example: false
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                lossCauseCode:
+                    description: Loss cause code
+                    type: string
+                    enum:
+                     - 'Fire'
+                     - 'Water'
+                     - 'Theft'
+                     - 'Liability'
+                     - 'Hail'
+                     - 'Lightning'
+                     - 'Wind'
+                     - 'Freeze'
+                     - 'Watercraft Hull'
+                     - 'Earthquake'
+                     - 'Tornado'
+                     - 'Other'
+                lossCauseDescription:
+                    description: Loss cause description
+                    type: string
+                    enum:
+                     - 'Fire'
+                     - 'Water'
+                     - 'Theft'
+                     - 'Liability'
+                     - 'Hail'
+                     - 'Lightning'
+                     - 'Wind'
+                     - 'Freeze'
+                     - 'Watercraft Hull'
+                     - 'Earthquake'
+                     - 'Tornado'
+                     - 'Other'
+                lossDate:
+                    description: Date when loss occured.
+                    type: string
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                negligentIndicator:
+                    description: Indicates whether the loss is due to negligence.
+                    type: boolean
+                    example: false
+                totalPaidAmount:
+                    description: Amount paid towards the claim.
+                    type: number
+                    pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+                weatherRelatedIndicator:
+                    description: Indicates whether the loss is due to any weather related mishaps.
+                    type: boolean
+                    example: false
+        CurrentCarrier:
+            description: Current Carrier Information
+            additionalProperties: false
+            type: object
+            properties:
+                continuousCoverage:
+                    description: How long the user has been continuously insured (in months)?
+                    type: number
+                    example: 36
+                    pattern: '^[0-9]*$'
+                contractDuration:
+                    $ref: '#/components/schemas/duration'
+                currentlyInsured:
+                    description: Indicates whether the primary driver is currently insured
+                    type: boolean
+                    example: true
+                expirationDate:
+                    description: when current policy expires (YYYY-MM-DD)?
+                    type: string
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                    example: '2020-11-23'
+                inceptionDate:
+                    $ref: '#/components/schemas/inceptionDate'
+                inceptionYear:
+                    $ref: '#/components/schemas/inceptionYear'
+                insurerName:
+                    description: Current Carrier Insurance Name
+                    type: string
+                    example: AAA
+                    maxLength: 40
+                    pattern: '^[a-z A-Z.\-''\/\\,0-9]{0,40}$'
+                insuredSince:
+                    description: Date since the driver is insured with the current carrier?
+                    type: string
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                    example: '2019-02-08'
+                policyNumber:
+                  $ref: '#/components/schemas/policyNumber'
+                productCode:
+                    $ref: '#/components/schemas/productCode'
+                productFamilyCode:
+                    $ref: '#/components/schemas/productFamilyCode'
+                productGroupCode:
+                    $ref: '#/components/schemas/productGroupCode'
+                yearsWithPriorInsurer:
+                    description: Number of years with prior carrier
+                    type: number
+                    pattern: '^[0-9]{0,5}$'
+        consent:
+            description: Consent info
+            additionalProperties: false
+            type: object
+            required:
+              - consentGranted
+              - consentGrantedBy
+              - consentTimestamp
+              - consentType
+              - ipAddress
+            properties:
+                consentGranted:
+                    description: Capture customers consent. Must be true in order to order reports; if false return an error
+                    type: boolean
+                consentGrantedBy:
+                  description: Capture name of the user creating the quote
+                  type: string
+                  pattern: '^[a-z A-Z.\-'']{0,40}$'
+                consentText:
+                  description: Free text to provide any additional remarks
+                  type: string
+                  pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+                consentTimestamp:
+                    description: time stamp when Consent is granted
+                    type: string
+                    format: date-time
+                    example: '2020-04-07T12:43:58Z'
+                consentType:
+                  description: Prefill, NCF, CLUE, MVR, SMS, Email, Call - consent report types
+                  type: string
+                  enum:
+                    - 'Prefill'
+                    - 'NCF'
+                    - 'CLUE'
+                    - 'MVR'
+                    - 'SMS'
+                    - 'Email'
+                    - 'Call'
+                    - 'DocumentSigned'
+                    - 'autoPay'
+                    - 'paperless'
+                    
+                ipAddress:
+                    description: End User IP address
+                    type: string
+                    format: ipv4
+                    example: 10.10.0.1
+        endorsements:
+            description: Endorsements related details
+            additionalProperties: false
+            type: object
+            properties:
+                endorsmentAppliedIndicator:
+                  type: boolean
+                  description: 'An indicator that indicates whether the endorsement is applied or available. true indicates the endorsement is applied, false indicates discount is available' 
+                endorsementFormName: 
+                    description: Endorsement form Name 
+                    type: string    
+                    pattern: '^[a-z A-Z 0-9.\-_'']{0,200}$'
+                    example: 'Fire Department Service Charge'
+                endorsementFormNumber:
+                    description: Endorsement form number
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+                    example: 'HS 04 90'
+                endorsementFormPremium:
+                    description: Endorsement form premium.
+                    type: number
+                    pattern: '^[0-9]{0,10}$'
+                additionalAttributes:
+                  type: array
+                  additionalProperties: false
+                  items:
+                    properties:
+                      key:
+                        description: Placeholder for the qualifiers associated with endorsements.
+                        type: string
+                        pattern: '^[a-z A-Z 0-9.(),\-'']{0,100}$'
+                        enum:
+                          - 'locationType'
+                          - 'coverageLimit'
+                          - 'structureDescription'
+                          - 'otherDescription'
+                          - 'propCoverageLimit'
+                          - 'liabCoverageLimit'
+                          - 'deductible'
+                          - 'masonryVeneerCoverage'
+                          - 'constructionType'
+                          - 'boatType'
+                          - 'hinNumber'
+                          - 'year'
+                          - 'make'
+                          - 'model'
+                          - 'engineDescription'
+                          - 'horsePower'
+                          - 'length'
+                          - 'maxSpeed'
+                          - 'numberPersons'
+                          - 'businessLocation'
+                          - 'LiabLimit'
+                          - 'description'
+                          - 'combinedEFLimitAmt'
+                          - 'fullTimeInside'
+                          - 'numberFTInside'
+                          - 'residenceFullTimeOutside'
+                          - 'numberResidentFTOutside'
+                          - 'estateFullTimeOutside'
+                          - 'numberEstateFTOutside'
+                          - 'liabilityLimit'
+                          - 'businessName'
+                          - 'businessDescription'
+                          - 'classification'
+                          - 'teacherExtendedLiability'
+                          - 'coAppClassification'
+                          - 'qualifyingQuestion'
+                          - 'numberFamilyUnits'
+                          - 'sectionIITerritory'
+                          - 'typeOfAssociation'
+                          - 'nameOfAssociation'
+                          - 'typeOfBusiness'
+                          - 'equipmentOver50000'
+                          - 'footTrafficMoreThan2'
+                          - 'employeesOnPremises'
+                          - 'hazardousMaterials'
+                          - 'manufactureOrRepair'
+                          - 'conductedOrStoredDetached'
+                          - 'comment'
+                          - 'boatType'
+                          - 'hin'
+                          - 'year'
+                          - 'make'
+                          - 'model'
+                          - 'horsepower'
+                          - 'length'
+                          - 'deductible'
+                          - 'lossPayeeName'
+
+                      value:
+                        description: Value corresponding to the qualifier mentioned in the key attribute
+                        type: string
+                        pattern: '^[a-z A-Z 0-9.(),\-'']{0,100}$'
+                address:
+                  $ref: '#/components/schemas/Address'  
+        miscellaneousFees:
+          description: Premium related details
+          additionalProperties: false
+          type: array
+          items:
+            properties:
+              miscellaneousFeeAmount:
+                description: Miscellaneous fee
+                type: number
+                pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+              miscellaneousFeeType:
+                description: Tax/Fee type. The values can be Tax, Fee.
+                type: string
+                example: 'Tax'
+                pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+        mortgagee:
+            description: Mortgage related details
+            additionalProperties: false
+            type: object
+            properties:
+                loanNumber: 
+                    description: Loan number
+                    type: string 
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                mortgageeAddress:
+                  $ref: '#/components/schemas/Address' 
+                mortgageeId:
+                  description: This is the partner specific unique identifier given to a mortgagee.
+                  type: string
+                  example: m1
+                  pattern: '^[a-z A-Z 0-9.\-_]{0,40}$' 
+                mortgageeName:
+                    description: Name of mortgage
+                    type: string 
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                objectId:
+                  $ref: '#/components/schemas/objectId'
+        premiums:
+            description: Premium related details
+            additionalProperties: false
+            type: object
+            required:
+              - premiumType
+              - premiumAmount
+              - payments
+            properties:  
+                packageType:   
+                  type: string  
+                  description: Type of package the customer can choose from.  
+                  example: Dafault
+                  pattern: '^[a-z A-Z.\-'']{0,40}$'
+                coverages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/coverages' 
+                discounts:
+                  $ref: '#/components/schemas/discounts'     
+                payments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PaymentOption'  
+                premiumDetails:  
+                  type: array  
+                  items:  
+                    properties:
+                      premiumType:
+                          description: Premium type
+                          type: string
+                          pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                      premiumAmount: 
+                          description: Premium amount
+                          type: string  
+                          pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+                      paymentPlan:
+                          $ref: '#/components/schemas/paymentPlan'
+                      totalPremiumAmount:
+                        $ref: '#/components/schemas/totalPremiumAmount'
+        discountsApplied:
+            description: Discounts applied.
+            additionalProperties: false
+            type: object
+            properties:
+                discountDescription:
+                  type: string
+                  example: 'Group Affinity'
+                  pattern: '^[a-z A-Z.(),\-'']{0,100}$'
+                discountType:
+                  type: string
+                  example: 'AFNTY'
+                  pattern: '^[a-z A-Z.(),\-'']{0,100}$'
+                percentage: 
+                  type: string
+                  pattern: '^[0-9]*$'
+                points:
+                  type: string
+                  pattern: '^[0-9]*$'
+                premium:
+                  type: number
+                  example: 10.00
+                  pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+                referenceId:
+                  type: string
+                  description: reference the object to which this discount is applied.
+                  pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+        discountsNotApplied:
+            description: Discounts not applied.
+            additionalProperties: false
+            type: object
+            properties:
+                discountDescription:
+                  type: string
+                  example: 'Group Affinity'
+                  pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                discountType:
+                  type: string
+                  example: 'AFNTY'
+                  pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                percentage: 
+                  type: string
+                points:
+                  type: string
+                  pattern: '^[0-9]*$'
+                premium:
+                  type: number
+                  example: 10.00
+                referenceId:
+                  type: string
+                  description: reference the object to which this discount is not applicable.
+        discounts:
+            description: Discounts related details.
+            additionalProperties: false
+            type: object
+            properties:  
+              discountsApplied:
+                  description: Discounts applied.
+                  type: array
+                  items:
+                      $ref: '#/components/schemas/discountsApplied'
+              discountsNotApplied:
+                  description: Discounts not applied.
+                  type: array
+                  items:
+                      $ref: '#/components/schemas/discountsNotApplied'
+        questionsSet:
+            description: Questions set.
+            additionalProperties: false
+            type: object
+            properties:
+                answerBinary:
+                    description: Answer binary.
+                    type: boolean
+                answerCode:
+                    description: Answer code.
+                    type: string
+                    pattern: '^[A-Z a-z .#$%*&0-9]{0,40}$'
+                answerText:
+                    description: Answer text.
+                    type: string
+                    pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+                questionCode:
+                    description: Question code.
+                    type: string
+                    pattern: '^[A-Z a-z -.#$%*&0-9]{0,50}$'
+                questionName:
+                    description: Question name.
+                    type: string
+                    example: 'Prior policy status indicator'
+                    pattern: '^[A-Z a-z -.#$%*&0-9]{0,150}$'
+                questionText:
+                    description: Question text.
+                    type: string
+                    pattern: ^[a-z A-Z 0-9 -\".,\/\\*@#$%^']{0,1500}$
+                additionalAttributes:
+                  type: array
+                  additionalProperties: false
+                  items:
+                    properties:
+                      key:
+                        description: Placeholder for the qualifiers associated with underwriting questions.
+                        type: string
+                        pattern: '^[a-z A-Z 0-9.(),\-'']{0,100}$'
+                      value:
+                        description: Value corresponding to the qualifier mentioned in the key attribute
+                        type: string
+                        pattern: '^[a-z A-Z 0-9.(),\-'']{0,100}$'
+        thirdPartyDesignee:
+          description: Third party designee related information. This is a state related information, which might be required for some of the states.
+          additionalProperties: false
+          type: object
+          properties:
+            name:
+              $ref: '#/components/schemas/Name'
+            address:
+              $ref: '#/components/schemas/Address'
+        additionalInsured:
+          description: Additional insured information.
+          additionalProperties: false
+          type: object
+          properties:
+            additionalInsuredId:
+              description: This is the partner specific unique identifier given to an additional insured.
+              type: string
+              example: ai1
+              pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+            address:
+              $ref: '#/components/schemas/Address'
+            addressIndicator:
+              type: boolean
+              description: true indicates additionalInsured's address is different from mailing address. 
+            interestType:
+              type: string
+              description: Information related to additional interest.
+              enum:
+                - 'Trust'
+                - 'Individual'
+                - 'LLC'
+            name:
+              $ref: '#/components/schemas/Name'
+            objectId:
+              $ref: '#/components/schemas/objectId'
+        additionalInterest:
+          description: Additional interest information.
+          additionalProperties: false
+          type: object
+          properties:
+            additionalInterestId:
+              description: This is the partner specific unique identifier given to an additional interest.
+              type: string
+              example: ai1
+              pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+            address:
+              $ref: '#/components/schemas/Address'
+            additionalInterestDescription:
+              type: string
+              description: Information related to additional interest.
+              pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+            effectiveDate:
+              $ref: '#/components/schemas/effectiveDate'
+            name:
+              $ref: '#/components/schemas/Name'
+            objectId:
+              $ref: '#/components/schemas/objectId'
+        certificateHolder:
+          description: Certificate holder - applicable to SS HO4. A landlord who is added as a certificate holder on a HO4 policy, will get notified of a cancellation of a policy.
+          additionalProperties: false
+          type: object
+          properties:
+            address:
+              $ref: '#/components/schemas/Address'
+            certificateHolderId:
+              description: This is the partner specific unique identifier given to a certificate holder.
+              type: string
+              example: ch1
+              pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+            name:
+              $ref: '#/components/schemas/Name'
+            objectId:
+              $ref: '#/components/schemas/objectId'
+        report:
+          description: Report related information. Indicates placeholders for oredering several reports, status of reports, expiration dates for reports.
+          additionalProperties: false
+          type: object
+          properties:
+            reportType:
+              type: string
+              description: Indicates the type of the report.
+              enum:
+                - 'Valuation'
+                - 'InsuranceScore'
+                - 'FireLine'
+                - 'RiskMeter'
+                - 'PPCReport'
+                - 'FireDeptSubscription'
+                - 'CLUE'
+                - 'PropertyPreFill'
+                - 'HouseHoldMember'
+                - 'CurrentCarrier'
+                - 'InstantID'
+                - 'Foreclosure'
+                - 'PropertyData'
+            status:
+              type: string
+              description: Indicates the status of the ordered reports
+              enum:
+                - 'Alert'
+                - 'Success'
+                - 'Not Found'
+                - 'Not Ordered'
+            expirationDate:
+              type: string
+              description: Provides the date when the reports are expired.
+              pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+              example: '2020-11-24'
+        requestHeader:
+            description: Request header.
+            additionalProperties: false
+            type: object
+            required:
+                - requestId
+                - requestDateTimestamp
+            properties:
+                campaignId:
+                    description: Unique Idenifier for campaign, provided by consumer
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                customerId:
+                    description: Customerâ€™s unique identifier in the Partnerâ€™s application/system. This will be used later for any webhooks or callbacks to post quote status information.
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                languagePreference:
+                    description: Language preference code.
+                    type: string
+                    example: 'en_US'
+                    pattern: '^[a-z A-Z_]{0,10}$'
+                leadId:
+                    description: Unique Idenifier for lead UUID
+                    type: string
+                    example: a0b7f7ae-2598-4a48-8067-adefb79fe96f
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                leadSource:
+                    description: Identifies the source of the lead. It might be any of the partner channels like Assurance, Compare, or Bolt.
+                    type: string
+                    example: Assurance
+                    pattern: '^[a-z A-Z.\-'']{0,40}$'
+                partnerId:
+                    description: 'Unique partner ID. This will be provided while the partners are setup. Some of the valid values can be Assurance, Zebra, Bolt'
+                    type: string
+                    example: 'Assurance'
+                    pattern: '^[a-z A-Z.\-_'']{0,40}$'
+                quoteType:
+                    description: Type of quote Requested quick/Full
+                    type: string
+                    example: 'Quick'
+                    enum:
+                        - 'Quick'
+                        - 'Update'
+                        - 'Complete'
+                requestDateTimestamp:
+                    description: 'Request Time Stamp '
+                    type: string
+                    format: date-time
+                    example: '2019-04-23T14:35:38Z'
+                requestId:
+                    description: Unique Id for the Quote transaction UUID
+                    type: string
+                    format: uuid
+                    example: f94e54f8-50a6-43e3-9c2a-c2c60b13b14d
+        provider:
+          description: Information related to the provider. This segment captures details of the quote provider.
+          additionalProperties: false
+          type: object
+          required:
+            - providerCode
+            - providerName
+          properties:
+            addresses:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+            emails:
+                type: array
+                items:
+                  $ref: '#/components/schemas/emails'
+            phones:
+                type: array
+                items:
+                  $ref: '#/components/schemas/phones'
+            preference:
+              $ref: '#/components/schemas/preference'
+            providerCode:
+                description: provider organization code
+                type: string
+                enum:
+                  - ACG
+                  - ACE
+                  - CSAA
+            providerName:
+                description: Provider organization name
+                type: string
+                pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+            URLs:
+                type: array
+                items:
+                  $ref: '#/components/schemas/URLs'
+        URLs:
+          type: object
+          additionalProperties: false
+          properties:
+            URLType:
+              type: string
+              description: provides the type of URL to the resource.
+              example: 'Agent'
+              enum:
+                - Agent
+                - User
+                - Website
+                - SmartNav
+            URL:
+              type: string
+              description: provides the URL to the resource.
+              example: 'https://0sxezpcdeg.execute-api.us-west-2.amazonaws.com/adc-autoquotes/auto/v1/quotes/qte123456'
+              pattern: '^[a-z A-Z 0-9.*$&%#!+-\\-\/_]{0,256}$'
+        producer:
+            description: Information of Insurance Producer. This segment captures agency information and agent information.
+            additionalProperties: false
+            type: object
+            required:
+              - producerCode
+              - producerType
+            properties:
+                addresses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+                agentId:
+                  type: string
+                  description: Agent identifier. This can be used for tracking.
+                  pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                channelType:
+                  type: string
+                  description: indicates channel type. 
+                  example: 'AAA Agent'
+                  pattern: '^[A-Z a-z]{0,40}$'
+                emails:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/emails'
+                info:
+                    type: object
+                    properties:
+                        contractNumber:
+                            description: Producer Number
+                            type: string
+                            example: A12345
+                            pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                        placingOffice:
+                            description: Prodcucer Office Name
+                            type: string
+                            example: ABC Office
+                            pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                name:
+                    $ref: '#/components/schemas/Name'
+                producerType:
+                  type: string
+                  description: indicates producer type. 
+                  example: 'Aggregator'
+                  enum:
+                    - 'Aggregator'
+                    - 'DigitalAgency'
+                phones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/phones'
+                preference:
+                  $ref: '#/components/schemas/preference'
+                producerName:
+                    description: Producer organization name
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                producerCode:
+                    description: Producer organization code
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                salesChannel:
+                  type: string
+                  description: indicates sales channel. 
+                  example: 'callCenter'
+                URLs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/URLs'
+        preference:
+          type: object
+          additionalProperties: false
+          properties:
+            contactPreferenceMethod:
+                description: Indicates preferred contact method. The valid values can be Phone or Email 
+                type: string
+                example: 'Phone'
+                enum:
+                  - Phone
+                  - Email
+            contactPreferenceTime:
+                description: Indicates preferred contact time. Free form text with time zone
+                type: string
+                example: '9AM - 5 PM EST'
+                pattern: '^[a-z A-Z 0-9 -.:*@]{0,20}$'
+        persons:
+            description: Person related information. Person can be an agent, an insured, or a coinsured
+            additionalProperties: false
+            type: object
+            properties:
+                insuredId:
+                    description: Insured id for the request, It should be unique for each insureds to the request like I1/I2/I3
+                    type: string
+                    example: I1
+                    pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+                birthDate:
+                    description: Birth date
+                    type: string
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                    example: '2020-11-24'
+                educationLevelCode:
+                    description: Education level code
+                    type: string
+                    pattern: '^[A-Z a-z]{0,40}$'
+                educationLevelDescription:
+                    description: Education level description
+                    type: string
+                    pattern: '^[A-Z a-z]{0,40}$'
+                emails:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/emails'
+                gender: 
+                    description: Gender 
+                    type: string    
+                    enum:
+                        - male
+                        - female
+                        - nonConforming
+                insuranceScore:
+                    description: Insurance Score 
+                    type: string
+                    pattern: '^[0-9]*$'
+                insuranceScoreBand:
+                    description: Insurance Score Band, If provided, will use to determine Insurance Score If not
+                        provided, will order Insurance Score Report
+                    enum:
+                        - Excellent
+                        - Good
+                        - Fair
+                        - Poor
+                    type: string
+                    example: Excellent
+                jobClassCode:
+                    description: Job class code
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                jobDescription:
+                    description: Job description
+                    type: string
+                    pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                    enum:
+                      - 'Accountants'
+                      - 'Architect'
+                      - 'Computer_Professional'
+                      - 'Dentist'
+                      - 'Engineer'
+                      - 'Physicians'
+                      - 'Real_Estate_Agent'
+                      - 'Pharmacist'
+                      - 'Veterinarian'
+                      - 'Audiologist'
+                      - 'Fireman_Policeman'
+                      - 'Attorney'
+                      - 'Nurse'
+                      - 'Other''
+                maritalStatusCode:
+                    description: Marital Status of the Driver - M for Married, S for Single, D for Divorced, W for Widowed, P for Separated, C for Domestic partner 
+                    enum:
+                        - M
+                        - S
+                        - D
+                        - W
+                        - P
+                        - C
+                    type: string
+                    example: M
+                name:
+                    $ref: '#/components/schemas/Name'
+                objectId:
+                  $ref: '#/components/schemas/objectId'
+                organizationName:
+                    description: Person's organization name
+                    type: string
+                phones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/phones'
+                preference:
+                  $ref: '#/components/schemas/preference'
+                relationshipCode:
+                    description: Relationship to Primary insured. If the person is primary insured, relationshipCode will be self.
+                    enum:
+                        - Self
+                        - Spouse
+                        - Child
+                        - Parent
+                        - Other
+                        - OtherRelative
+                        - DomesticPartner
+                        - Sibling
+                    type: string
+                    example: Self
+                websiteURL:
+                    description: Indicates whether this is the preferred phone number
+                    type: string
+        phones:
+          type: object
+          additionalProperties: false
+          properties:
+            phoneNumber:
+                description: Phone number
+                type: string
+                pattern: ^[0-9]{10}$
+            phoneTypeCode:
+                description: Phone type code. The valid values can be Work or Home.
+                type: string
+                example: 'Work'
+            preferedIndicator:
+                description: Indicates whether this is the preferred phone number
+                type: string
+                pattern: '^[A-Z a-z]{0,5}$'
+        emails:
+          type: object
+          additionalProperties: false
+          properties:
+            emailID:
+                description: Email ID
+                type: string
+                pattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+            emailIDTypeCode:
+                description: EmailID type code. The valid values can be Work or Home.
+                type: string
+                example: 'Work'
+                pattern: '^[A-Z a-z]{0,10}$'
+            preferedIndicator:
+                description: Indicates whether this is the preferred emailID. Allowed values are true, false, yes, no.
+                type: string
+                pattern: '^[A-Z a-z]{0,5}$'
+        propertyDetails:
+            description: Contains set of attributes related to properties.
+            additionalProperties: false
+            type: object
+            properties:
+                propertyId:
+                    description: Property id for the request, It should be unique for each property
+                    type: string
+                    example: P1
+                    pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+                addresses:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+                advancedWDDIndicator:
+                  type: boolean
+                  description: True Indicates there is an advanced water detection device  in the household. Eligible for additional discounts. 
+                basementCompletionPercentage:
+                  type: number
+                  description: Provides the basement completion percentage.
+                  pattern: '^[0-9]*$'
+                basicWDDIndicator:
+                  type: boolean
+                  description: True Indicates there is a basic water detection device  in the household. Eligible for additional discounts. 
+                buildingCodeUpgrade:
+                  type: string
+                  description: A building code upgrade endorsement covers you for the increased costs associated with making your new home compliant with current building codes. This is only applicable to California HO3, and by default value is 0.1.
+                chamberCommerceDiscount:
+                  type: string
+                  description: Chamber of Commerce Discount. Applicable only for NJ
+                  example: 'Log'
+                  enum:
+                    - 'VINELAND_CC'
+                    - 'GLOUCESTER_CC'
+                    - 'SALEM_CC'
+                    - 'CAMDEN_CC'
+                    - 'NONE_CC'
+                constructionCode:
+                  type: string
+                  description: Construction code.
+                  example: 'Log'
+                  enum:
+                    - 'Masonry'
+                    - 'Log'
+                    - 'Frame'
+                    - 'Concrete'
+                    - 'Other'
+                exteriorWallFinish:
+                  type: string
+                  description: Exterior wall finish.
+                  enum:
+                    - 'BR'
+                    - 'W'
+                    - 'ASB'
+                    - 'VL'
+                    - 'T111'
+                    - 'SSTU'
+                    - 'STU'
+                foundationType:
+                  description: Indicates the foundation type of the property.
+                  type: string
+                  enum:
+                    - 'B'
+                    - 'HB'
+                    - 'CS'
+                    - 'CR'
+                    - 'P'
+                    - 'E'
+                    - 'ES'
+                    - 'PIL'
+                garageType:
+                  type: string
+                  description: Garage type of the property.
+                  enum:
+                    - 'None'
+                    - 'Attached / Built-In'
+                    - 'Basement'
+                    - 'Carport'
+                greenHomeDiscountIndicator:
+                  type: boolean
+                  description: Indicates whether the property is eligible for green home discount.
+                heatSourcePrimaryCode: 
+                  description: Indicates the heating source for the property.
+                  type: string
+                  pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                isOwned:
+                    description: Indicates whether the property is owned or rented. True indicates, it is owned, false indicates rented.
+                    type: boolean
+                isSmokeDetectorEnabledPerFloor: 
+                  description: Indicates true, if there is at least one smoke detector enabled per floor else false.
+                  type: boolean
+                isStoveInstallationByLicensedContractor: 
+                  description: Indicates true, if the wood burning stove is installed by a licensed contractor else false.
+                  type: boolean
+                isStoveSoleHeatSource: 
+                  description: Indicates true, if the wood burning stove is the sole heat source else false.
+                  type: boolean 
+                masonryVeneer :
+                  type: boolean
+                  description: masonry Veneer Indicator.
+                minimumHurricaneDeductiblePercentage:
+                  description: Minimum hurricane deductible percentage.
+                  type: number
+                  pattern: '^[0-9]*$'
+                numberOfFamilyUnits:
+                  $ref: '#/components/schemas/numberOfFamilyUnits'
+                numberOfFirePlaces:
+                  description: Indicates the number of fire places on the property.
+                  type: string
+                  pattern: '^[0-9]*$'
+                numberOfResidents:
+                  $ref: '#/components/schemas/numberOfResidents'
+                numberOfStories: 
+                  description: Indicates the number of stories on the property.
+                  type: string
+                  enum:
+                    - '1 Story'
+                    - '1.5 Stories'
+                    - '2 Stories'
+                    - '2.5 Stories'
+                    - 'Other'
+                purchaseDate:
+                    description: Property purchase date.
+                    type: string
+                    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+                    example: '2020-11-24'
+                pooltype:
+                  type: string
+                  description: Provides the pool type.
+                  enum:
+                    - 'None'
+                    - 'RestrictedNoAccessories'
+                    - 'RestrictedWAccessories'
+                    - 'RestrictedWDB'
+                    - 'Unrestricted'
+                propertySlope:
+                  type: string
+                  description: 'Property Slope from ISO. N- None (0 - 15 degrees), M - Moderate (16 - 30 degrees), S- Steep (greater than 30 degrees)'
+                  enum:
+                    - 'N'
+                    - 'M'
+                    - 'S'
+                qualityGrade:
+                  description: Indicates the foundation type of the property. 'S for Standard, A for Above Average, C for Custom'
+                  type: string
+                  enum:
+                    - 'S'
+                    - 'A'
+                    - 'C'
+                residenceUseCode:
+                  type: string
+                  description: Residency use code.
+                  pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                residenceUseDescription:
+                  type: string
+                  description: Residency use description.
+                  pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                replacementCost:
+                  description: Indicates the cost of replacing the property.
+                  type: number
+                  pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+                roofingMaterialCode:
+                  type: string
+                  description: Roofing material code of the property.
+                  enum:
+                    - 'Asphalt'
+                    - 'Tar'
+                    - 'Clay Tile'
+                    - 'Tile'
+                    - 'Slate'
+                    - 'Metal'
+                    - 'Wood'
+                    - 'Other'
+                    - 'Laminate'
+                roofingMaterialDescription:
+                  type: string
+                  description: Roofing material description of the property.
+                roofAge:
+                  type: string
+                  description: Roof age of the property.
+                  pattern: '^[0-9]*$'
+                siteAccess:
+                  type: string
+                  description: 'Site Access from ISO. N - Average - no unusual constraints, I - Island access, RR - Rural/remote, U - Urban access'
+                  enum:
+                    - 'N'
+                    - 'I'
+                    - 'RR'
+                    - 'U'
+                spatype:
+                  type: string
+                  description: Provides the spa type.
+                  enum:
+                    - 'None'
+                    - 'Restricted'
+                    - 'Unrestricted'
+                squareFootage:
+                  type: string
+                  description: Square footage of the property.
+                  pattern: '^[0-9]*$'
+                trampolineIndicator:
+                  type: boolean
+                  description: Indicates availability of trampoline on premise.
+                trampolinetype:
+                  type: string
+                  description: Provides the trampoline type.
+                  enum:
+                    - 'RestrictedAboveGrdWNet'
+                    - 'RestrictedAboveGrdWNoNet'
+                    - 'RestrictedInGroundWNet'
+                    - 'RestrictedInGroundNoNet'
+                    - 'Unrestricted'
+                undergroundStorageIndicator:
+                  type: boolean
+                  description: Indicates whether underground storage of fuel tank is available on premise.
+                windStormDiscount:
+                  type: boolean
+                  description: Indicates whether the Windstorm Mitigation Discount is applied. Applicable only for CT
+                woodBurningStoveIndicator:
+                  type: boolean
+                  description: Indicates whether the property has a wood burning stove.
+                yearBuilt:
+                  type: string
+                  description: Year built.
+                  pattern: '^[0-9]{0,4}$'
+                animals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/animal'
+                buildingProtection:
+                  $ref: '#/components/schemas/buildingProtection'
+                coverages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/coverages'
+                deductibles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/deductibles'
+                detachedStructures:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/detachedStructure'
+                occupancy:
+                  type: object
+                  properties:
+                    occupancyTypeCode:
+                      type: string
+                      description: Occupancy type code. Valid values are Coc - for in course of construction, Unocc - for non owner occupancy, Owner - for owner occupied, Tenant - for tenant occupied, Vacant - for vacant
+                      example: 'COC'
+                      enum:
+                        - 'Coc'
+                        - 'Unocc'
+                        - 'Owner'
+                        - 'Tenant'
+                        - 'Vacant'
+                    residenceTypeCode:
+                      type: string
+                      description: Residence type code.
+                      enum:
+                        - 'Primary'
+                        - 'Secondary'
+                        - 'Seasonal'
+                    tenantPolicy:
+                      type: boolean
+                      description: Indicates whether tenant has HO4 policy
+                    territoryCode:
+                      type: string
+                      description: Territory code.
+                      pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                    rentedDuration:
+                      $ref: '#/components/schemas/duration'
+                    unoccupiedDuration:
+                      $ref: '#/components/schemas/duration'
+                renovations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/renovations'
+        renovations:
+            type: object
+            additionalProperties: false
+            properties:
+              completionDate:
+                type: string
+                description: Date when renovation is completed.
+                pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+              completionPercentage:
+                type: string
+                description: Percentage of completion of renovation.
+                pattern: '^[0-9]*$'
+              renovationType:
+                type: string
+                description: Type of renovation
+                enum:
+                  - 'Roof'
+                  - 'HeatingAir'
+                  - 'Plumbing'
+                  - 'Electrical'
+              renovationDescription:
+                type: string
+                description: Type of renovation description 
+                enum:
+                  - 'Total_Replace'
+                  - 'Partial_Replace'
+                  - 'Total_Add_layer'
+                  - 'Three_And_More_Layers'
+                  - 'Spot_Repair'
+                  - 'Total_Circuit_Or_Romex'
+                  - 'Total_Copper'
+                  - 'Total_PEX'
+                  - 'Forced_Air'
+                  - 'Hydronic_Radiant'
+                  - 'Space_Heater'
+                  - 'Other'
+        detachedStructure:
+          description: List of attributes related to fire safety for the property. Distance to fire station is measured in miles and distance to hydrant is measured in feet
+          additionalProperties: false
+          type: object
+          properties:
+            detachedStructureDescription:
+              type: string
+              example: porch
+              description: Detached structure description.
+              pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+            detachedStructureId:
+              description: This is the partner specific unique identifier given to a detached structure.
+              type: string
+              example: ai1
+              pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+            detachedStructureIndicator:
+              type: boolean
+              description: Indicates whether the property has a detached structure with it.
+            detachedStructureLimit:
+              type: number
+              description: Detached structure limit.
+              pattern: '^[0-9]*$'
+            rentedToOthersIndicator:
+              type: boolean
+              description: Indicates whether the detached structure on the property has been rented to others.
+            numberOfFamilyUnits:
+              $ref: '#/components/schemas/numberOfFamilyUnits'
+            numberOfResidents:
+              $ref: '#/components/schemas/numberOfResidents'
+            objectId:
+              $ref: '#/components/schemas/objectId'
+        buildingProtection:
+          description: List of attributes related to buulding protection on the property. Distance to fire station is measured in miles and distance to hydrant is measured in feet
+          additionalProperties: false
+          type: object
+          properties:
+            distancetoFireStation:
+              type: string
+              description: distance to fire station is provided in free form text with the pattern < 1000 feet, or >= 1000 feet
+              pattern: '^[a-z A-Z 0-9.(),<>=\-''_"]{0,100}$'
+            distancetoHydrant:
+              type: string
+              description: distance to fire hydrant is provided in free form text with the pattern < 1000 feet, or >= 1000 feet
+              pattern: '^[a-z A-Z 0-9.(),<>=\-''_"]{0,100}$'
+            hailResistanceRating:
+              description: Provides hail rating.
+              type: string
+              enum:
+                - 'No'
+                - '1'
+                - '2'
+                - '3'
+                - '4'
+            isCentralBurglarAlarmEnabled: 
+              description: Indicates whether central burglar alarm is enabled. If false, central burglar alarm is not enabled.
+              type: boolean
+            isCentralFireAlarmEnabled: 
+              description: Indicates whether central fire alarm is enabled. If false, central fire alarm is not enabled.
+              type: boolean
+            isDoorLockEnabled: 
+              description: Indicates whether dead bolt is enabled. If false, dead bolt is not used.
+              type: boolean
+            isGatedCommunity: 
+              description: Indicates whether the community is a gated community.
+              type: boolean
+            isLocalBurglarAlarmEnabled: 
+              description: Indicates whether local burglar alarm is enabled. If false, local burglar alarm is not enabled.
+              type: boolean
+            isLocalFireAlarmEnabled: 
+              description: Indicates whether local fire alarm is enabled. If false, local fire alarm is not enabled.
+              type: boolean
+            isSmokeAlarmEnabledAllFloors: 
+              description: Indicates whether smoke alarms are enabled on all floors. If false, smoke alarms are not enabled on all floors.
+              type: boolean
+            isSmokeAlarmEnabledPartial: 
+              description: Indicates whether smoke alarms are enabled partially, not on all floors. If true, smoke alarms are not enabled on all floors.
+              type: boolean
+            IsSprinklerEnabledAllFloors: 
+              description: Indicates whether sprinklers are enabled on all floors. If false, sprinklers are not enabled on all floors.
+              type: boolean
+            IsSprinklerEnabledPartial: 
+              description: Indicates whether sprinklers are enabled on partially. If true, sprinklers are not enabled on all floors.
+        animal:
+            description: List of animals in the household.
+            additionalProperties: false
+            type: object
+            properties:
+              animalType:
+                description: Type of animal. 
+                type: string
+                pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+              animalBreed:
+                description: Breed of animal. 
+                type: string
+                pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+              numberOfAnimals:
+                description: Number of animals of a type. 
+                type: number
+                pattern: '^[0-9]*$'
+        coverages:
+            description: List of coverage related attributes.
+            additionalProperties: false
+            type: object
+            required:
+              - coverageCode
+            properties:
+              coverageCode:
+                description: Coverage code. 
+                type: string
+                enum:
+                  - 'DWELL'
+                  - 'ERC'
+                  - 'OS'
+                  - 'PP'
+                  - 'ALEXP'
+                  - 'PL'
+                  - 'MEDPM'
+                  - 'LOU'
+              coverageDescription:
+                description: Coverage description. 
+                type: string
+                enum:
+                  - 'Dwelling Liability'
+                  - 'Extended Replacement Cost'
+                  - 'Other structures'
+                  - 'Personal Property'
+                  - 'Additional living expenses'
+                  - 'Personal Liability'
+                  - 'Medical Payments'
+                  - 'Loss of Use'
+              coveragePremium:
+                description: 'coverage premium will be available only in response'
+                type: number
+                pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+              deductible:
+                $ref: '#/components/schemas/deductibles'
+                description: ' Any deductible assocaited with coverages'
+                type: string
+              limit:
+                description: 'limit per accident'
+                type: string
+                example: '300000'
+                pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+        deductibles:
+          type: object
+          additionalProperties: false
+          properties:
+            deductibleAppliesToCode:
+              description: provides the code to which deductible is applied.
+              type: string
+              enum:
+                - 'WH'
+                - 'AO'
+                - 'HU'
+            deductibleAppliesToDescription:
+              description: provides the description to which deductible is applied.
+              type: string
+              enum:
+                - 'Wind/Hail Deductible'
+                - 'All other perils Deductible'
+                - 'Hurricane Deductible'
+            maximum:
+              description: provides the maximum deductible.
+              type: string
+              pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+        completePropertyQuoteRequest:
+          description: Its a schema for property quote request object for the complete method
+          additionalProperties: false
+          required:
+            - metaData
+          type: object
+          properties:
+            metaData:
+              $ref: '#/components/schemas/requestHeader'
+            consents:
+              type: array
+              items:
+                $ref: '#/components/schemas/consent'
+            producer:
+              $ref: '#/components/schemas/producer'
+        IssuePropertyPolicyRequest:
+          description: Its a schema for property quote rquest object for the issue policy method
+          additionalProperties: false
+          required:
+            - metaData
+          type: object
+          properties:
+            metaData:
+              $ref: '#/components/schemas/requestHeader'
+            autoPaySelected:
+              $ref: '#/components/schemas/autoPaySelected'
+            downPayment:
+              $ref: '#/components/schemas/downPayment'
+            optInForRecurringPayment:
+              type: boolean
+              description: 'true if opted in for recurring payment options else false'
+            paperlessIndicator:
+              $ref: '#/components/schemas/paperlessIndicator'
+            consents:
+              type: array
+              items:
+                $ref: '#/components/schemas/consent'
+            documents:
+              type: array
+              items:
+                $ref: '#/components/schemas/document'
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/payment'
+        payment:
+          description: 'Place holder for the payment details - down payment and recurring payments'
+          additionalProperties: false
+          type: object
+          properties:
+            methodOfPayment:
+              $ref: '#/components/schemas/methodOfPayment'
+            paymentAccountToken:
+              description: 'The payment token provided by the PaymentAccountTokenization API. This is required for ACH/Credit card.'
+              type: string
+              example: 10
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+            paymentReceiptNumber:
+              description: 'Place holder to capture the receipt number for those partners that have been approved to collect downpayment and we donâ€™t receive a payment token. We could instead ask for just amount and the receipt#.'
+              type: string
+              example: 10
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+            paymentType:
+              description: 'Payment type - downpayment or recurring payment'
+              type: string
+              enum:
+                - 'DownPayment'
+                - 'Recurring'
+        prebindDocument:
+          description: Document entity to capture document related information. 
+          additionalProperties: false
+          type: object
+          properties:
+            documentFileName:
+              description: 'Document file name referring to the unique system identifier for the document instance. Generated by the mediation layer.'
+              type: string
+              example: 'PAA_kRp7hnbhUbbqVe96LB1Lqg'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,50}$'
+            documentURL:
+              description: 'The URL provided to the partners for accessing the document'
+              type: string
+              example: 'https://api-<<env>>.n01.csaa-insurance.aaa.com/adc-doc/v1/documents/{id}'
+              pattern: '^[a-z A-Z 0-9.*$&%#!+-\\-\/_]{0,256}$'
+            encryptionType:
+              description: 'Encryption type used for encrypton the document'
+              type: string
+              example: 'kRp7hnbhUbbqVe96LB1Lqg'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,50}$'
+            contentType:
+              description: 'Document content type'
+              type: string
+              example: 'PDF'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,50}$'
+            documents:
+              type: array
+              items:
+                $ref: '#/components/schemas/document'
+        document:
+          description: Document entity to capture document related information. 
+          additionalProperties: false
+          type: object
+          properties:
+            documentCode:
+              description: 'Document code referring to the unique template code for the document in document management system.'
+              type: string
+              example: 'PAA'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,50}$'
+            documentId:
+              description: 'Document id referring to the unique system identifier for the document instance in document management system.'
+              type: string
+              example: 'PAA_kRp7hnbhUbbqVe96LB1Lqg'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,50}$'
+            documentName:
+              description: 'Document name for the document instance in document management system.'
+              type: string
+              example: 'Auto Insurance Application'
+              pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,150}$'
+        autoPaySelected:
+          description: ' Indicator to show if autopay is wanted'
+          type: boolean
+          example: true
+        downPayment:
+          description: 'Down payment '
+          type: string
+          example: 200
+          pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+        extraOrdinaryLifeCircumstance:
+          type: string
+          description: Extraordinary Life Circumstances due to which there could have been an impact to the credit score or insurance score.
+          enum:
+            - 'None'
+            - 'Cat'
+            - 'Illness'
+            - 'Death'
+            - 'Divorce'
+            - 'LostEmployment'
+            - 'Military'
+            - 'IDTheft'
+            - 'Other'
+            - 'Decline'
+            - 'Dissolution'
+        methodOfPayment:
+          description: ' Selected Method of Payment'
+          enum:
+            - EFT
+            - CreditCard
+            - DebitCard
+          type: string
+          example: "EFT"
+        objectId:
+          description: System generated object ID
+          type: string
+          pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+        orderInsuranceScore:
+            description: <i>Deprecated</i>- Indicates whether insurance score report needs to be ordered. By default, value is false. If sent as true, insurance score report will be ordered as part of the service.
+            type: boolean
+        packageSelection:
+          description: ' Package selected for coverages'
+          type: string
+          example: basic
+          pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,20}$'
+        packageType:
+          type: string
+          description: Type of package the customer can choose from.
+          enum:
+            - 'Heritage'
+            - 'Legacy'
+            - 'Prestige'
+        paperlessIndicator:
+            description: Indicates whether paperless options are preferred.
+            type: boolean
+        paymentPlan:
+          description: 'Payment Plan Selected for the new Policy - TBD'
+          type: string
+          example: "payInFull"
+          enum:
+            - 'payInFull'
+            - 'monthly'
+            - 'quarterly'
+            - 'semiAnnual'
+            - 'mortgagee'
+        policyNumber:
+            description: Current Carrier Policy Number
+            type: string
+            example: AZ123456770-01
+            pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+        policyTerm:
+            description: Requested Policy Term, 6 or 12 (semi-annual or annual); if not provided, will default
+                to the product term
+            enum:
+                - 6
+                - 12
+            type: number
+            example: 12
+        postalCode:
+            description: 'Policy Postal Code, If Not provided defaults to residential address'
+            type: string
+            pattern: '^([0-9]{5}-[0-9]{4})$|^([0-9]{5})$'
+            example: '85303'
+        quoteNumber:
+            description: Unique identifier for a quote in the policy administration system.
+            type: string
+            pattern: '^[a-z A-Z 0-9.\-_]{0,40}$'
+        riskState:
+            description: 'Policy State Code, If Not provided defaults to residential address'
+            maxLength: 2
+            type: string
+            pattern: '^[A-Z a-z]{2}$'
+            example: AZ
+        effectiveDate:
+            description: Effective date in the format provided in example.
+            type: string
+            pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+            example: '2020-11-24'
+        inceptionDate:
+            description: Policy inception date in the format provided in example.
+            type: string
+            pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+            example: '2020-11-24'
+        inceptionYear:
+            description: Year when policy became effective.
+            type: string
+            example: '2020'
+            pattern: '^[0-9]{0,4}$'
+        expirationDate:
+            description: Effective date in the format provided in example.
+            type: string
+            pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$'
+            example: '2020-11-24'
+        productFamilyCode:
+            description: Provides line of business. Highest level of product hierarchy.
+            type: string
+            example: 'Property'
+            enum: 
+              - 'Auto'
+              - 'Property'
+        numberOfFamilyUnits:
+          description: Indicates the number of family units on the property.
+          type: string
+          enum:
+            - 'SingleFamily'
+            - 'Duplex'
+            - 'Triplex'
+            - 'Fourplex'
+            - 'Five'
+            - '16-30'
+            - '31-45'
+            - '46-60'
+            - '61 or more'
+        numberOfResidents:
+          description: Indicates the number of residents currently residing in the household.
+          type: number
+          pattern: '^[0-9]*$'
+        productGroupCode:
+            description: Next level of product hierarchy. The valid values can be Home, Condo, Renter, Rental
+            type: string
+            example: 'Home'
+            enum: 
+              - 'Home'
+              - 'Condo'
+              - 'Renter'
+              - 'Rental'
+        productType:
+            description: Same as productGroupCode. To indicate enumerations separately introduced an additional attribute
+            type: string
+            enum: 
+              - 'HOME'
+              - 'AUTO'
+              - 'CONDO'
+              - 'RENTER'
+              - 'LIFE'
+              - 'WATERCRAFT'
+        productCode:
+            description: Third level of product hierarchy. The allowed values could be choice or signature series.
+            type: string
+            pattern: '^[a-z A-Z 0-9_-]{0,20}$'
+        totalPremiumAmount:
+          description: 'Total premium'
+          type: number
+          example: 1400
+          pattern: '^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$'
+        duration:
+            description: Requested contract duration. By default, considered as 12 months.
+            additionalProperties: false
+            type: object
+            properties:
+              numberOfUnits:
+                description: Number of months for the contract duration. 
+                type: number
+                pattern: '^[0-9]{0,5}$'
+              unitMeasurementCode:
+                description: Indicates the measurement code for the number provided under numberOfUnits attribute. By default, MON is assumed.
+                type: string
+                pattern: '^[a-z A-Z_]{0,20}$'
+        Fault:
+            description: Error Response from API
+            additionalProperties: false
+            required:
+                - message
+            type: object
+            properties:
+                message:
+                    type: string
+                    description: generic error message description.
+                errors:
+                    type: array
+                    items:
+                      properties:
+                        messageCode:
+                          type: string
+                          description: error code
+                          pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                        messageDescription:
+                          type: string
+                          description: Error message in detail. 
+                          pattern: '^[a-z A-Z 0-9.(),\-''_"]{0,100}$'
+                        relatedAttribute:  
+                          type: string
+                          description: attribute name that needs to be corrected in order to avoid the validation error.
+                          pattern: '^[a-z A-Z 0-9.-\\-\/_]{0,40}$'
+x-amazon-apigateway-request-validators:
+  'Validate body, query string parameters, and headers':
+      validateRequestParameters: true
+      validateRequestBody: true

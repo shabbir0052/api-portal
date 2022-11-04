@@ -1,0 +1,2866 @@
+---
+openapi: 3.0.1
+info:
+  title: One AAA Experience auto quote API
+  version: 1.49.0
+  description: "This API provides auto quote experience for one AAA. This API is built
+    for B2B partners consumption. A mapping spec that contains mandatory/optional
+    parameters, enumerations and any specific rules that the consumers need to be
+    aware of, will be supplemented for further readability of this API. This API will
+    provide a premium based on the information provided.\n<br>\n<br>\n  <u><b>Way
+    to invoke the API</b></u>\n<br>\n   1. Invoke security token API with relevant
+    client id and client secret for authorization token. As a best practice, it is
+    suggested to cache the authorization token at the client end till the token expires.
+    Token expiry can be found at \"expires_in\" attribute of the token API response.
+    \"expires_in\" is in milliseconds. \n<br> 2. Use the authorization token as the
+    bearer token to invoke the quote API with relevant payload. Expired token usage
+    will result in 401.</br> 3. To invoke the API, a minimum of TLSv1.2 protocol has
+    to be used."
+servers:
+- url: https://api-adc1.n01.csaa-insurance.aaa.com/{basePath}
+  variables:
+    basePath:
+      default: adc-autoquote
+paths:
+  "/auto/v1/quotes":
+    post:
+      summary: This API is used for creating a quick auto quote.
+      description: The API is used for creating a quick auto quote. Quick quote feature
+        will respond with a quote number and a premium based on the information provided.
+        It does not run any report and will not return a rate, if some of the critical
+        information is not provided in the request payload. Successful response (quote
+        number with premium) will have a http status code of 201. Any other HTTP status
+        code returned by the API is due to an error during the validation, rating
+        or some technical glitches.
+      operationId: createAutoQuote
+      tags:
+      - OneAAA experience auto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AutoQuoteRequest"
+        required: true
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      responses:
+        '201':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIResponse"
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '403':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 403 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+  "/auto/v1/quotes/{id}":
+    put:
+      summary: This API is used for updating a previously created auto quote.
+      description: This API is used for updating a previously created auto quote.
+        This API supports updating a quote. You need to explicitly request updating
+        a quote by passing in quoteType attribute value as "Update".
+      operationId: updateAutoQuote
+      tags:
+      - OneAAA experience auto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AutoQuoteRequest"
+        required: true
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      - name: id
+        description: Unique quote number that requires updating
+        schema:
+          type: string
+          example: qte123456789
+        in: path
+        required: true
+      responses:
+        '200':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIResponse"
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '403':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 403 response
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 404 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+    get:
+      summary: This API is used for retrieving an existing auto quote based on quote
+        number.
+      operationId: retrieveAutoQuote
+      tags:
+      - OneAAA experience auto
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      - name: id
+        description: Unique quote number that requires updating
+        schema:
+          type: string
+          example: qte123456789
+        in: path
+        required: true
+      responses:
+        '200':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIResponse"
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '403':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 403 response
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 404 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+  "/auto/v1/quotes/{id}/complete":
+    put:
+      summary: This API is used for completing a previously created auto quote.
+      description: This API is used for completing a previously created/updated auto
+        quote. This API supports
+      operationId: completeAutoQuote
+      tags:
+      - OneAAA experience auto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/completeAutoQuoteRequest"
+        required: true
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      - name: id
+        description: Unique quote number that requires updating
+        schema:
+          type: string
+          example: qte123456789
+        in: path
+        required: true
+      responses:
+        '200':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIResponse"
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '403':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 403 response
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 404 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+  "/auto/v1/quotes/{id}/issue - deprecated":
+    post:
+      summary: This API is used for binding/issuing a previously created auto quote.
+      description: This API is used for binding/issuing a previously created auto
+        quote.
+      operationId: IssueAutoPolicy
+      tags:
+      - OneAAA experience auto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/IssueAutoPolicyRequest"
+        required: true
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      - name: id
+        description: Unique quote number that requires updating
+        schema:
+          type: string
+          example: qte123456789
+        in: path
+        required: true
+      responses:
+        '200':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIResponse"
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '403':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 403 response
+        '404':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 404 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+  "/auto/v1/quotes/health":
+    get:
+      summary: Auto quote API health check
+      description: Health check API for auto quote
+      tags:
+      - OneAAA experience auto
+      parameters:
+      - name: x-api-key
+        description: Unique api key for each consumer
+        schema:
+          type: string
+          example: 4xyz78b9-0cdc
+        in: header
+        required: true
+      responses:
+        '200':
+          headers:
+            correlationId:
+              schema:
+                type: string
+          content:
+            application/json: {}
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 400 response
+        '401':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 401 response
+        '409':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 409 response
+        '422':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 422 response
+        '500':
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Fault"
+          description: 500 response
+      security:
+      - csaaapihubquoteAPIoktaAuthorizer: []
+      x-amazon-apigateway-request-validator: Validate body, query string parameters,
+        and headers
+      x-amazon-apigateway-integration: {}
+components:
+  securitySchemes:
+    csaaapihubquoteAPIoktaAuthorizer:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        authorizerUri: ''
+        authorizerResultTtlInSeconds: 0
+        identityValidationExpression: Bearer.*
+        type: token
+  schemas:
+    AutoQuoteRequest:
+      description: Its a schema for autoQuote Request Object
+      additionalProperties: false
+      required:
+      - metaData
+      - consents
+      - drivers
+      - vehicles
+      - riskState
+      type: object
+      properties:
+        metaData:
+          "$ref": "#/components/schemas/ReqMetaData"
+        autoPaySelected:
+          "$ref": "#/components/schemas/autoPaySelected"
+        effectiveDate:
+          "$ref": "#/components/schemas/effectiveDate"
+        elc:
+          "$ref": "#/components/schemas/elc"
+        eValueDiscountIndicator:
+          "$ref": "#/components/schemas/eValueDiscountIndicator"
+        expirationDate:
+          "$ref": "#/components/schemas/expirationDate"
+        optionalCoverageIndicator:
+          "$ref": "#/components/schemas/optionalCoverageIndicator"
+        orderInsuranceScore:
+          "$ref": "#/components/schemas/orderInsuranceScore"
+        orderCurrentCarrierReport:
+          "$ref": "#/components/schemas/orderCurrentCarrierReport"
+        packageSelection:
+          "$ref": "#/components/schemas/packageSelection"
+        paperlessIndicator:
+          "$ref": "#/components/schemas/paperlessIndicator"
+        paymentPlan:
+          "$ref": "#/components/schemas/paymentPlan"
+        policyNumber:
+          "$ref": "#/components/schemas/policyNumber"
+        policyTerm:
+          "$ref": "#/components/schemas/policyTerm"
+        postalCode:
+          "$ref": "#/components/schemas/postalCode"
+        productCode:
+          "$ref": "#/components/schemas/productCode"
+        productFamilyCode:
+          "$ref": "#/components/schemas/productFamilyCode"
+        productGroupCode:
+          "$ref": "#/components/schemas/productGroupCode"
+        quoteNumber:
+          "$ref": "#/components/schemas/quoteNumber"
+        quoteReferenceNumber:
+          "$ref": "#/components/schemas/quoteNumber"
+        residenceType:
+          "$ref": "#/components/schemas/residenceType"
+        riskState:
+          "$ref": "#/components/schemas/riskState"
+        consents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/consent"
+        coverages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Coverage"
+        currentCarrier:
+          "$ref": "#/components/schemas/CurrentCarrier"
+        discounts:
+          type: array
+          items:
+            "$ref": "#/components/schemas/discounts"
+        drivers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Driver"
+        existingAAAPolicies:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ExistingPolicies"
+        partnerMemberships:
+          type: array
+          items:
+            "$ref": "#/components/schemas/MembershipInfo"
+        primaryInsuredContactInfo:
+          "$ref": "#/components/schemas/Contact"
+        producer:
+          "$ref": "#/components/schemas/Producer"
+        provider:
+          "$ref": "#/components/schemas/provider"
+        questions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/QuestionsSet"
+        reports:
+          type: array
+          items:
+            "$ref": "#/components/schemas/report"
+        thirdPartyDesignee:
+          "$ref": "#/components/schemas/thirdPartyDesignee"
+        vehicles:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Vehicle"
+        proofConfirmation:
+          "$ref": "#/components/schemas/proofConfirmation"
+    completeAutoQuoteRequest:
+      description: Its a schema for autoQuote request object for the complete method
+      additionalProperties: false
+      required:
+      - metaData
+      type: object
+      properties:
+        metaData:
+          "$ref": "#/components/schemas/ReqMetaData"
+        consents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/consent"
+        producer:
+          "$ref": "#/components/schemas/Producer"
+    IssueAutoPolicyRequest:
+      description: Its a schema for auto quote rquest object for the issue policy
+        method
+      additionalProperties: false
+      required:
+      - metaData
+      type: object
+      properties:
+        metaData:
+          "$ref": "#/components/schemas/ReqMetaData"
+        autoPaySelected:
+          "$ref": "#/components/schemas/autoPaySelected"
+        downPayment:
+          "$ref": "#/components/schemas/downPayment"
+        paperlessIndicator:
+          "$ref": "#/components/schemas/paperlessIndicator"
+        documents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/document"
+        consents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/consent"
+        payments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/payment"
+    Producer:
+      description: Information of Insurance Producer. This segment captures agency
+        information and agent information. Producer code and producer type varies
+        based on the partners. This will be determined during he onboarding phase.
+      additionalProperties: false
+      type: object
+      required:
+      - producerCode
+      - producerType
+      properties:
+        addresses:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Address"
+        agentId:
+          type: string
+          description: Agent identifier. This can be used for tracking.
+        channelType:
+          type: string
+          description: indicates channel type.
+          example: AAA Agent
+          pattern: "^[A-Z a-z]{0,40}$"
+        emails:
+          type: array
+          items:
+            "$ref": "#/components/schemas/emails"
+        info:
+          type: object
+          additionalProperties: false
+          properties:
+            contractNumber:
+              description: Producer Number
+              type: string
+              example: A12345
+              pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+            placingOffice:
+              description: Prodcucer Office Name
+              type: string
+              example: ABC Office
+              pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        name:
+          "$ref": "#/components/schemas/Name"
+        producerType:
+          type: string
+          description: indicates producer type.
+          example: Aggregator
+          enum:
+          - Aggregator
+          - DigitalAgency
+        phones:
+          type: array
+          items:
+            "$ref": "#/components/schemas/phones"
+        preference:
+          "$ref": "#/components/schemas/preference"
+        producerName:
+          description: Producer organization name
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        producerCode:
+          description: Producer organization code
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        salesChannel:
+          type: string
+          description: indicates sales channel.
+          example: 2507
+        URLs:
+          type: array
+          items:
+            "$ref": "#/components/schemas/URLs"
+    preference:
+      type: object
+      additionalProperties: false
+      properties:
+        contactPreferenceMethod:
+          description: Indicates preferred contact method. The valid values can be
+            Phone or Email
+          type: string
+          example: Phone
+          pattern: "^[a-z A-Z 0-9 -:.*@]{0,20}$"
+        contactPreferenceTime:
+          description: Indicates preferred contact time. Free form text with time
+            zone
+          type: string
+          example: 9AM - 5 PM EST
+          pattern: "^[a-z A-Z 0-9 -:.*@]{0,20}$"
+    ReqMetaData:
+      description: " Meta data of a quote Request"
+      additionalProperties: false
+      required:
+      - requestId
+      - requestDateTimestamp
+      type: object
+      properties:
+        campaignId:
+          description: Unique Idenifier for campaign, provided by consumer
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        customerId:
+          description: Customerâ€™s unique identifier in the Partnerâ€™s application/system.
+            This will be used later for any webhooks or callbacks to post quote status
+            information.
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        languagePreference:
+          description: Language preference code.
+          type: string
+          example: en_US
+          pattern: "^[a-z A-Z_]{0,10}$"
+        leadId:
+          description: Unique Idenifier for lead UUID
+          type: string
+          example: a0b7f7ae-2598-4a48-8067-adefb79fe96f
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        partnerId:
+          description: Unique partner ID. This will be provided while the partners
+            are setup. Some of the valid values can be Assurance, Zebra, Bolt
+          type: string
+          example: Assurance
+          pattern: "^[a-z A-Z.\\-_']{0,40}$"
+        quoteType:
+          description: Type of quote Requested. This attribute is mandatory for update
+            and complete operation.
+          type: string
+          example: Quick
+          enum:
+          - Quick
+          - Update
+          - Complete
+        requestDateTimestamp:
+          description: 'Request Time Stamp '
+          type: string
+          example: '2019-04-23T14:35:38Z'
+          format: date-time
+        requestId:
+          description: Unique Id for the Quote transaction UUID
+          type: string
+          example: f94e54f8-50a6-43e3-9c2a-c2c60b13b14d
+          format: uuid
+    phones:
+      type: object
+      additionalProperties: false
+      properties:
+        phoneNumber:
+          description: Phone number
+          type: string
+          pattern: "^[0-9]{10}$"
+        phoneTypeCode:
+          description: Phone type code
+          type: string
+          example: Work
+          enum:
+          - Work
+          - Home
+          - Cell
+        preferedIndicator:
+          description: Indicates whether this is the preferred phone number. yes,
+            no, true, false are preferred values.
+          type: string
+          pattern: "^[A-Z a-z]{0,5}$"
+    emails:
+      type: object
+      additionalProperties: false
+      properties:
+        emailID:
+          description: Email ID
+          type: string
+          pattern: ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
+        emailIDTypeCode:
+          description: EmailID type code
+          type: string
+          example: Work
+          pattern: "^[A-Z a-z]{0,10}$"
+          enum:
+          - Home
+          - Personal
+          - Work
+        preferedIndicator:
+          description: Indicates whether this is the preferred emailID. yes, no, true,
+            false are preferred values.
+          type: string
+          pattern: "^[A-Z a-z]{0,5}$"
+    provider:
+      description: Information related to the provider. This segment captures details
+        of the quote provider.
+      additionalProperties: false
+      type: object
+      required:
+      - providerCode
+      - providerName
+      properties:
+        addresses:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Address"
+        emails:
+          type: array
+          items:
+            "$ref": "#/components/schemas/emails"
+        phones:
+          type: array
+          items:
+            "$ref": "#/components/schemas/phones"
+        preference:
+          "$ref": "#/components/schemas/preference"
+        providerCode:
+          description: provider organization code
+          type: string
+          enum:
+          - ACG
+          - ACE
+          - CSAA
+        providerName:
+          description: provider organization name
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        URLs:
+          type: array
+          items:
+            "$ref": "#/components/schemas/URLs"
+    URLs:
+      type: object
+      additionalProperties: false
+      properties:
+        URLType:
+          type: string
+          description: provides the type of URL to the resource.
+          example: Website
+          enum:
+          - Agent
+          - User
+          - Website
+          - SmartNav
+        URL:
+          type: string
+          description: provides the URL to the resource.
+          example: https://0sxezpcdeg.execute-api.us-west-2.amazonaws.com/adc-autoquotes/auto/v1/quotes/qte123456
+          pattern: "^[a-z A-Z 0-9.*$&%#!+-\\\\-\\/_]{0,256}$"
+    PaymentOption:
+      description: Payment Options
+      additionalProperties: false
+      type: object
+      properties:
+        autoPaySelected:
+          "$ref": "#/components/schemas/autoPaySelected"
+        discountPercentage:
+          description: Discount provided in percentage
+          type: number
+          example: 10
+          pattern: "^[0-9]*$"
+        downPayment:
+          "$ref": "#/components/schemas/downPayment"
+        downPaymentFee:
+          description: Down payment fee including any taxes that needs to be applied
+            against down payment
+          type: number
+          example: 100
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        totalDownPayment:
+          description: Total down payment including any one time fee and downpayment
+          type: number
+          example: 100
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        downPaymentPct:
+          description: Down payment Percentage
+          type: string
+          example: 100
+          pattern: "^[0-9]*$"
+        installmentAmount:
+          description: Installment amount
+          type: number
+          example: 100
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        installmentFee:
+          description: Installment fee that needs to be applied against every installment
+          type: number
+          example: 100
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        installmentDueDate:
+          description: Installment due date. This will be populated only in the issue
+            policy response.
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2029-03-14'
+        methodOfPayment:
+          "$ref": "#/components/schemas/methodOfPayment"
+        numberOfInstallments:
+          description: Number of insallments to be made
+          type: number
+          example: 12
+          pattern: "^[0-9]*$"
+        paymentPlan:
+          "$ref": "#/components/schemas/paymentPlan"
+        payPlanPremiumAmount:
+          description: Premium associated with the payment plan
+          type: number
+          example: 1200
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        totalPremiumAmount:
+          "$ref": "#/components/schemas/totalPremiumAmount"
+    payment:
+      description: Place holder for the payment details - down payment and recurring
+        payments
+      type: object
+      additionalProperties: false
+      properties:
+        methodOfPayment:
+          "$ref": "#/components/schemas/methodOfPayment"
+        paymentAccountToken:
+          description: The payment token provided by the PaymentAccountTokenization
+            API. This is required for ACH/Credit card.
+          type: string
+          example: 10
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        paymentReceiptNumber:
+          description: Place holder to capture the receipt number for those partners
+            that have been approved to collect downpayment and we donâ€™t receive a
+            payment token. We could instead ask for just amount and the receipt#.
+          type: string
+          example: 10
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        paymentType:
+          description: Payment type - downpayment or recurring payment
+          type: string
+          enum:
+          - DownPayment
+          - Recurring
+    Coverage:
+      description: Coverage Object. The coverage codes TORT, UMSU, UNIMSU, UNIMCONV
+        are boolean attributes and does not require any deductible, limit1 or limit2.
+      type: object
+      additionalProperties: false
+      required:
+      - coverageCode
+      properties:
+        coverageCode:
+          description: 'Coverage Code '
+          type: string
+          example: BI
+          enum:
+          - BI
+          - SSL
+          - PD
+          - UIM
+          - UIUNIM
+          - UNIM
+          - UIMPD
+          - UNIMPD
+          - MEDPM
+          - BPIP
+          - APIP
+          - PIPDED
+          - TORT
+          - UMSU
+          - UNIMSU
+          - UNIMCONV
+          - PIPNONMEDEXP
+          - OBEL
+          - ENHANCEDUIM
+          - FPB
+          - EMB
+          - PIPMEDICAL
+          - FUNERAL
+          - WLR
+          - PIPWORKLOSS
+          - PIPDEDAPPTO
+          - GPIP
+          - IL
+        coverageDescription:
+          description: Coverage Code description
+          type: string
+          example: Bodily Injury Limit
+          enum:
+          - Bodily Injury Limit
+          - Spousal Liability
+          - Property Damage Limit
+          - Uninsured Motorist Limit
+          - Uninsured/Underinsured Motorist Limit
+          - Underinsured Motorist Limit
+          - Uninsured Motorist Property Damage Limit
+          - Underinsured Motorist Property Damage Limit
+          - Medical payments limit
+          - Basic Personal Injury Protection Limit
+          - Additional Personal Injury Protection Limit
+          - Personal Injury Protection Deductible
+          - Tort coverage
+          - Uninsured Motorist Stacked
+          - Underninsured Motorist Unstacked
+          - Underinsured Motorist Conversion Coverage
+          - Non-Medical Expense
+          - Optional Basic Economic Loss
+          - Enhanced UIM
+          - First Party Benefits
+          - Extraordinary Medical Expense Benefit
+          - PIP Medical and Rehabilitation Expense
+          - Funeral Expense Benefits
+          - Rejection of Work Loss
+          - Work Loss Benefits
+          - PIP Deductible Applies To
+          - Guest Personal Injury Protection
+          - Income Loss
+        coveragePremium:
+          description: coverage premium will be available only in response
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        deductible:
+          description: " Any deductible assocaited with coverages"
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        limit1:
+          description: limit per person
+          type: string
+          example: '100000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        limit2:
+          description: limit per accident
+          type: string
+          example: '300000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        noCoverage:
+          description: Indicates whether the customer has opted in for this coverage
+            or not. An optional attribute. If this attribute has a value true, then
+            it indicates the customer has explicitly requested to opt out of this
+            coverage. False or not populating this attribute indicates that customer
+            has opted in this coverage.
+          type: boolean
+        qualifier:
+          description: Indicates the qualifer for the coverage. The value could be
+            Basic, Added, Combo1, Combo2 or Combo3 for First Party Benefits (FPB),
+            NamedInsured or Family for PIP Deductible Applies To(PIPDEDAPPTO), Full
+            or Guest for Basic Personal Injury Protection Limit(BPIP).
+          type: string
+    vehicleCoverage:
+      description: Coverage Object. The coverage codes GLASS, TOW, LOAN, NEW, OEM,
+        RIDESHARE  are boolean attributes and does not require any deductible, limit1
+        or limit2.
+      type: object
+      additionalProperties: false
+      required:
+      - coverageCode
+      properties:
+        coverageCode:
+          description: 'Coverage Code '
+          type: string
+          example: COMPDED
+          enum:
+          - COMPDED
+          - COLLDED
+          - CDW
+          - GLASS
+          - RREIM
+          - TOW
+          - LOAN
+          - OEM
+          - RIDESHARE
+          - UMPDDED
+          - NEW
+          - UMPDVEH
+          - SPECEQUIP
+        coverageDescription:
+          description: Coverage Code description
+          type: string
+          example: Comprehensive Deductible
+          enum:
+          - Comprehensive Deductible
+          - Collision Deductible
+          - Collision Deductible Waiver
+          - Glass Coverage
+          - Rental Reimbursement Coverage
+          - Towing Limit
+          - Loan/Lease Coverage
+          - Original Equipment Manufacturer Parts Coverage
+          - Rideshare Coverage
+          - Uninsured Motorist Property Damage Deductible
+          - New Car Coverage
+          - Uninsured Motorist Property Damage by Vehicle
+          - Special Equipment
+        coveragePremium:
+          description: coverage premium will be available only in response
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        deductible:
+          description: " Any deductible assocaited with coverages"
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        limit1:
+          description: limit per person
+          type: string
+          example: '100000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        limit2:
+          description: limit per accident
+          type: string
+          example: '300000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        noCoverage:
+          description: Indicates whether the customer has opted in for this coverage
+            or not. An optional attribute. If this attribute has a value true, then
+            it indicates the customer has explicitly requested to opt out of this
+            coverage. False or not populating this attribute indicates that customer
+            has opted in this coverage.
+          type: boolean
+    premiumCoverage:
+      description: Coverage Object
+      type: object
+      additionalProperties: false
+      properties:
+        coverageCode:
+          description: 'Coverage Code '
+          type: string
+          example: BI
+          enum:
+          - BI
+          - SSL
+          - PD
+          - UIM
+          - UIUNIM
+          - UNIM
+          - UIMPD
+          - UNIMPD
+          - MEDPM
+          - BPIP
+          - APIP
+          - PIPDED
+          - TORT
+          - UMSU
+          - UNIMSU
+          - UNIMCONV
+          - UMPDVEH
+          - SPECEQUIP
+          - COMPDED
+          - COLLDED
+          - CDW
+          - GLASS
+          - RREIM
+          - TOW
+          - LOAN
+          - OEM
+          - RIDESHARE
+          - UMPDDED
+          - NEW
+          - OBEL
+          - PIPNONMEDEXP
+          - ENHANCEDUIM
+          - FPB
+          - EMB
+          - PIPMEDICAL
+          - FUNERAL
+          - WLR
+          - PIPWORKLOSS
+          - PIPDEDAPPTO
+          - GPIP
+          - IL
+        coverageDescription:
+          description: Coverage Code description
+          type: string
+          example: Bodily Injury Limit
+          enum:
+          - Bodily Injury Limit
+          - Spousal Liability
+          - Property Damage Limit
+          - Uninsured Motorist Limit
+          - Uninsured/Underinsured Motorist Limit
+          - Underinsured Motorist Limit
+          - Uninsured Motorist Property Damage Limit
+          - Underinsured Motorist Property Damage Limit
+          - Medical payments limit
+          - Basic Personal Injury Protection Limit
+          - Additional Personal Injury Protection Limit
+          - Personal Injury Protection Deductible
+          - Tort coverage
+          - Uninsured Motorist Stacked
+          - Underninsured Motorist Unstacked
+          - Underinsured Motorist Conversion Coverage
+          - Uninsured Motorist Property Damage by Vehicle
+          - Special Equipment
+          - Comprehensive Deductible
+          - Collision Deductible
+          - Collision Deductible Waiver
+          - Glass Coverage
+          - Rental Reimbursement Coverage
+          - Towing Limit
+          - Loan/Lease Coverage
+          - Original Equipment Manufacturer Parts Coverage
+          - Rideshare Coverage
+          - Uninsured Motorist Property Damage Deductible
+          - New Car Coverage
+          - Non-Medical Expense
+          - Optional Basic Economic Loss
+          - Enhanced UIM
+          - First Party Benefits
+          - Extraordinary Medical Expense Benefit
+          - PIP Medical and Rehabilitation Expense
+          - Funeral Expense Benefits
+          - Rejection of Work Loss
+          - Work Loss Benefits
+          - PIP Deductible Applies To
+          - Guest Personal Injury Protection
+          - Income Loss
+        coveragePremium:
+          description: coverage premium will be available only in response
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        deductible:
+          description: " Any deductible assocaited with coverages"
+          type: number
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        limit1:
+          description: limit per person
+          type: string
+          example: '100000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        limit2:
+          description: limit per accident
+          type: string
+          example: '300000'
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)|([a-z A-Z]{0,20})(.[0-9][0-9])?$"
+        qualifier:
+          description: Indicates the qualifer for the coverage. The value could be
+            Combo1, Combo2 or Combo3 for First Party Benefits (FPB), NamedInsured
+            or Family for PIP Deductible Applies To(PIPDEDAPPTO), Full or Guest for
+            Basic Personal Injury Protection Limit(BPIP).
+    Name:
+      description: 'Person Name '
+      additionalProperties: false
+      required:
+      - firstName
+      - lastName
+      type: object
+      properties:
+        firstName:
+          description: First Name
+          maxLength: 40
+          type: string
+          example: John
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+        givenName:
+          description: Nick Name
+          maxLength: 40
+          type: string
+          example: Sue
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+        lastName:
+          description: Last Name
+          maxLength: 40
+          type: string
+          example: Smith
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+        middleName:
+          description: Middle Name
+          maxLength: 40
+          type: string
+          example: M
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+        suffix:
+          description: suffix
+          maxLength: 40
+          enum:
+          - JR
+          - SR
+          - I
+          - II
+          - III
+          - IV
+          - V
+          - VI
+          type: string
+          example: JR
+        title:
+          description: 'title '
+          maxLength: 40
+          type: string
+          example: Ms
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+    Contact:
+      description: " Contact Information of Primary Insured"
+      additionalProperties: false
+      required:
+      - name
+      - emails
+      - phones
+      - addresses
+      type: object
+      properties:
+        addresses:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Address"
+        addressIndicator:
+          description: other Address related Questions
+          additionalProperties: false
+          type: object
+          properties:
+            lengthOfStay:
+              description: Length of stay at an address in years. if less than a year,
+                indicate as 0. if less than three years, then priorAddressIndicator
+                needs to be passed as true and prior address segment need to be populated.
+              type: number
+              example: 18
+              pattern: "^[0-9]{1,2}$"
+            moveInDate:
+              description: " Date insured moved into prior house YYYY-MM-DD"
+              type: string
+              pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+              example: '2017-11-21'
+        emails:
+          type: array
+          items:
+            "$ref": "#/components/schemas/emails"
+        name:
+          "$ref": "#/components/schemas/Name"
+        phones:
+          type: array
+          items:
+            "$ref": "#/components/schemas/phones"
+        preference:
+          "$ref": "#/components/schemas/preference"
+    Address:
+      description: Address Object
+      additionalProperties: false
+      required:
+      - addressTypeCode
+      - addressLine1
+      - city
+      - stateProvCode
+      - postalCode
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          example: 123 Main st
+          maxLength: 100
+          pattern: "^[A-Z a-z 0-9 \\/\\\\(),.#$%*&0-9]{0,100}$"
+        addressLine2:
+          type: string
+          example: Apt23
+          maxLength: 100
+          pattern: "^[A-Z a-z 0-9 \\/\\\\(),.#$%*&0-9]{0,100}$"
+        addressTypeCode:
+          type: string
+          enum:
+          - Mailing
+          - Billing
+          - Residential
+          - Prior
+          - Business
+          - Garaging
+          example: Mailing
+        addressValidated:
+          description: if the address is validated by partner
+          default: false
+          type: boolean
+          example: true
+        city:
+          type: string
+          example: Phoenix
+          pattern: "^[A-Z a-z.]{0,40}$"
+        countryCode:
+          type: string
+          example: US
+          pattern: "^[A-Z a-z]{2,3}$"
+        county:
+          type: string
+          example: Maricopa
+          pattern: "^[A-Z a-z. 0-9]{0,40}$"
+        postalCode:
+          "$ref": "#/components/schemas/postalCode"
+        stateProvCode:
+          maxLength: 2
+          type: string
+          example: AZ
+          pattern: "^[A-Z a-z]{2}$"
+    thirdPartyDesignee:
+      description: Third party designee related information. This is a state related
+        information, which might be required for some of the states.
+      additionalProperties: false
+      type: object
+      properties:
+        name:
+          "$ref": "#/components/schemas/Name"
+        address:
+          "$ref": "#/components/schemas/Address"
+    MembershipInfo:
+      description: MembershipInformation
+      additionalProperties: false
+      type: object
+      properties:
+        membershipIndicator:
+          description: Indicates whether the user is a current AAA member .
+          type: string
+          enum:
+          - 'Yes'
+          - 'No'
+          - Pending
+        membershipName:
+          enum:
+          - AAA
+          - AARP
+          - LYFT
+          type: string
+          example: AAA
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        membershipNumber:
+          type: string
+          example: 1234567890-05
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        membershipPlan:
+          description: Membsership Plan classic/gold/platinum
+          type: string
+          example: Classic
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        membershipSince:
+          description: Date since membership begun.
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2019-02-08'
+        membershipStatus:
+          description: AAA Membership Status.
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        membershipTotalYears:
+          description: Membership years
+          type: number
+          example: 2
+          pattern: "^[0-9]*$"
+    ExistingPolicies:
+      description: Existing AAA Policies
+      additionalProperties: false
+      type: object
+      properties:
+        productType:
+          "$ref": "#/components/schemas/productType"
+    CurrentCarrier:
+      description: Current Carrier Information
+      type: object
+      additionalProperties: false
+      properties:
+        continuousCoverage:
+          description: How long the user has been continuously insured (in months)?
+          type: number
+          example: 36
+          pattern: "^[0-9]*$"
+        currentlyInsured:
+          description: Indicates whether the primary driver is currently insured
+          type: boolean
+          example: true
+        customerEntered:
+          description: Indicates whether the current carrier information is provided
+            by the customer.
+          type: boolean
+          example: true
+        expirationDate:
+          "$ref": "#/components/schemas/expirationDate"
+        inceptionDate:
+          "$ref": "#/components/schemas/inceptionDate"
+        inceptionYear:
+          "$ref": "#/components/schemas/inceptionYear"
+        insurerName:
+          description: Current Carrier Insurance Name
+          type: string
+          example: AAA
+          maxLength: 40
+          pattern: "^[a-z A-Z.\\-'\\/\\\\,0-9]{0,40}$"
+        insuredSince:
+          description: Date since the driver is insured with the current carrier?
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2019-02-08'
+        minimumLimits:
+          description: Policy has Min Limits, If provided, prior BI will be set to
+            minimum for state
+          type: boolean
+          example: false
+        policyNumber:
+          "$ref": "#/components/schemas/policyNumber"
+        priorBILimit:
+          description: BI Limits of policy
+          type: string
+          example: 100000/300000
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?\\\\?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        productCode:
+          "$ref": "#/components/schemas/productCode"
+        productFamilyCode:
+          "$ref": "#/components/schemas/productFamilyCode"
+        productGroupCode:
+          "$ref": "#/components/schemas/productGroupCode"
+        yearsWithPriorInsurer:
+          description: Number of years with prior carrier
+          type: number
+          pattern: "^[0-9]{0,5}$"
+    CurrentCarrierExceptions:
+      description: Current Carrier Information
+      type: object
+      additionalProperties: false
+      properties:
+        isActiveDutyIndicator:
+          description: True, only if deployed and now purchasing insurance. This attribute
+            indicates the reason why current carrier information is missing and uses
+            PAS defaults which will give the customer 6 months of current carrier
+            and minimum BI limits.
+          type: boolean
+          example: false
+        isFirstTimeVehiclePurchaseIndicator:
+          description: True, only if purchasing a car for the first time. This attribute
+            indicates the reason why current carrier information is missing and uses
+            PAS defaults which will give the customer 6 months of current carrier
+            and minimum BI limits.
+          type: boolean
+          example: false
+    DriverLicense:
+      description: Driver License Information
+      additionalProperties: false
+      required:
+      - licenseState
+      type: object
+      properties:
+        licenseEverSuspended:
+          description: Is driver license ever suspended?
+          type: boolean
+          example: false
+        licenseExpirationDate:
+          description: When license will be expired YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2029-03-14'
+        licenseIssuedDate:
+          description: When license was issued YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '1987-03-15'
+        licensePermitNumber:
+          description: Driver License Number.
+          type: string
+          example: BC123456
+          pattern: "^[a-z A-Z 0-9]{0,40}$"
+        licenseStatus:
+          description: Drivers License Status
+          enum:
+          - Active
+          - Expired
+          - International
+          - Learner
+          - None
+          - Other
+          - Permit
+          - Probation
+          - Restricted
+          - Revoked
+          - Suspended
+          - Temporary
+          type: string
+          example: Active
+        licenseState:
+          description: Driverâ€™s License State.
+          minLength: 2
+          type: string
+          example: AZ
+          pattern: "^[A-Z a-z]{2}$"
+        suspendedReason:
+          description: Reason for the license suspension
+          enum:
+          - Failure to pay ticket
+          - DUI
+          - Received too many tickets
+          - No insurance
+          - Other
+          type: string
+          example: DUI
+    DrivingHistory:
+      description: Drivers Driving Hostory such as violations/tickets/claims/accidents
+      type: object
+      additionalProperties: false
+      properties:
+        amountPaid:
+          description: Amount paid on claim
+          type: number
+          example: 1004
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        category:
+          description: Category of violation being reported - TBD
+          type: string
+          example: Major
+          enum:
+          - Minor
+          - Non-Moving Violation
+          - Major
+          - Alcohol Related Violation
+          - Speeding
+          - At Fault
+          - NonFault
+          - Comprehensive
+        incidentDescription:
+          description: " Description of the violation"
+          type: string
+          example: Failure to stop
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        incidentType:
+          description: Type of incident that resulted in violation being reported
+            - TBD
+          type: string
+          example: DUI
+          enum:
+          - DUI
+          - DR
+          - EOS
+          - FLE
+          - HAR
+          - HOM
+          - RKD
+          - SUS
+          - TGT
+          - CRD
+          - DEV
+          - DFC
+          - DOS
+          - DWE
+          - DWW
+          - FTC
+          - FTY
+          - HOV
+          - ILU
+          - IND
+          - IP
+          - IS
+          - IT
+          - IUT
+          - NIN
+          - SCH
+          - WSR
+          - DEQ
+          - LIC
+          - NLP
+          - SBL
+          - SPD
+          - Comprehensive Claim
+          - Accident (property damage only)
+          - Accident (Resulting in Bodily Injury)
+          - Accident (Not-At-Fault)
+        occurrenceDate:
+          description: Occurrence date of the violation YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2020-01-31'
+        reportSource:
+          description: Source of the report for driving history.
+          type: string
+          enum:
+          - MVR
+          - CLUE
+          - Customer Input
+        reportActivityCategory:
+          description: Category of the activity in the driving history report.
+          type: string
+          enum:
+          - Violation
+          - Claim
+    DriverAssignment:
+      description: " Which Drivers assigned to a vehicle"
+      type: object
+      additionalProperties: false
+      properties:
+        driverId:
+          description: driverId from Driver object
+          type: string
+          example: D1
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        isPrimary:
+          description: indicates whether the driver is primary.
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        usePct:
+          description: vehicle usage in percentage for this driver 0 to 100
+          maximum: 100
+          minimum: 0
+          type: number
+          example: 100
+          pattern: "^[0-9]*$"
+    status:
+      description: " Provides validation messges from the backend system"
+      type: object
+      additionalProperties: false
+      properties:
+        messageCode:
+          description: Response message code.
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        messageDescription:
+          description: Response message description
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,100}$"
+        messageType:
+          type: string
+          description: message category.
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        relatedAttribute:
+          type: string
+          description: attribute name that needs to be corrected in order to avoid
+            the validation error.
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+    consent:
+      description: Consent info
+      type: object
+      additionalProperties: false
+      required:
+      - consentGranted
+      - consentGrantedBy
+      - consentTimestamp
+      - consentType
+      - ipAddress
+      properties:
+        consentGranted:
+          description: Capture customers consent. Must be true in order to order reports;
+            if false return an error
+          type: boolean
+        consentGrantedBy:
+          description: Capture name of the user creating the quote
+          type: string
+          maxLength: 40
+          pattern: "^[a-z A-Z.\\-']{0,40}$"
+        consentText:
+          description: Free text to provide any additional remarks
+          type: string
+          maxLength: 1500
+          pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+        consentTimestamp:
+          description: time stamp when Consent is granted
+          format: date-time
+          type: string
+          example: '2020-04-07T12:43:58.111Z'
+        consentType:
+          description: Prefill, NCF, CLUE, MVR, SMS, Email, Call - consent report
+            types
+          type: string
+          enum:
+          - Prefill
+          - NCF
+          - CLUE
+          - MVR
+          - SMS
+          - Email
+          - Call
+          - AutoPay
+          - Paperless
+          - paperlessOptIn
+          - CADMV
+        ipAddress:
+          description: End User IP address
+          type: string
+          example: 10.10.0.1
+          format: ipv4
+    prebindDocument:
+      description: Document entity to capture document related information.
+      type: object
+      additionalProperties: false
+      properties:
+        documentFileName:
+          description: Document file name referring to the unique system identifier
+            for the document instance. Generated by the mediation layer.
+          type: string
+          example: PAA_kRp7hnbhUbbqVe96LB1Lqg
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,50}$"
+        documentURL:
+          description: The URL provided to the partners for accessing the document
+          type: string
+          example: https://api-<<env>>.n01.csaa-insurance.aaa.com/adc-doc/v1/documents/{id}
+          pattern: "^[a-z A-Z 0-9.*$&%#!+-\\\\-\\/_]{0,256}$"
+        encryptionType:
+          description: Encryption type used for encrypton the document
+          type: string
+          example: SHA-256
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,50}$"
+        contentType:
+          description: Document content type
+          type: string
+          example: PDF
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,50}$"
+        documents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/document"
+    document:
+      description: Document entity to capture document related information.
+      type: object
+      additionalProperties: false
+      properties:
+        documentCode:
+          description: Document code referring to the unique template code for the
+            document in document management system.
+          type: string
+          example: PAA
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,50}$"
+        documentId:
+          description: Document id referring to the unique system identifier for the
+            document instance in document management system.
+          type: string
+          example: PAA_kRp7hnbhUbbqVe96LB1Lqg
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,50}$"
+        documentName:
+          description: Document name for the document instance in document management
+            system.
+          type: string
+          example: Auto Insurance Application
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,150}$"
+    Driver:
+      description: Driver Information
+      additionalProperties: false
+      required:
+      - birthDate
+      - name
+      - relationshipCode
+      - driverId
+      type: object
+      properties:
+        driverId:
+          description: Driver id for the request, It should be unique for each driver
+            to the request like D1/D2/D3
+          type: string
+          example: D1
+        objectId:
+          description: System generated object ID
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        ageFirstLicensed:
+          description: Age at which the driver was first licensed
+          type: number
+          example: 16
+          pattern: "^[0-9]*$"
+        bankruptcy:
+          description: Has the driver ever declared bankruptcy?
+          default: false
+          type: boolean
+          example: false
+        birthDate:
+          description: Date of birth of the driver , YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '1990-01-31'
+        creditRating:
+          description: Self-assessed credit rating of the driver
+          enum:
+          - Excellent
+          - Good
+          - Average
+          - BelowAverage
+          - Poor
+          type: string
+          example: Good
+        currentCarrierExceptions:
+          "$ref": "#/components/schemas/CurrentCarrierExceptions"
+        defensiveDriverCourseInd:
+          description: Is driver taken any defencive driving course
+          type: boolean
+          example: true
+        defensiveDriverCourseNumber:
+          description: Defensive driving course completion certificate number
+          type: string
+          example: A123456
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        defensiveDriverCourseCompletionDate:
+          description: Defensive driving course completion date YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2020-02-23'
+        distantStudentInd:
+          description: Driver is a distant student and age between 16-24
+          type: boolean
+          example: true
+        discounts:
+          type: array
+          items:
+            "$ref": "#/components/schemas/discounts"
+        driverSafetyRating:
+          description: Provides driver safety rating based on dmv reports
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        drivingHistory:
+          type: array
+          items:
+            "$ref": "#/components/schemas/DrivingHistory"
+        drivingLicense:
+          "$ref": "#/components/schemas/DriverLicense"
+        education:
+          description: Level Of education
+          type: string
+          example: Masters
+          pattern: "^[A-Z a-z]{0,40}$"
+        emails:
+          type: array
+          items:
+            "$ref": "#/components/schemas/emails"
+        employmentStatus:
+          description: Current employment Status
+          enum:
+          - Employed
+          - Unemployed
+          - Retired
+          - Student
+          type: string
+          example: Employed
+        enrollInUsageBasedInsurance:
+          description: " Is driver wants to enroll in UBI "
+          type: boolean
+          example: false
+        financialResponsibilityInd:
+          description: Does this driver require SR-22 filing?
+          default: false
+          type: boolean
+          example: false
+        financialResponsibilityCaseNumber:
+          description: This attribute contains the case number for SR22. It is required,
+            if financialResponsibilityInd is true
+          type: string
+          pattern: "^[A-Z a-z 0-9]{0,40}$"
+        gender:
+          description: Persons Gender
+          enum:
+          - male
+          - female
+          - nonConforming
+          type: string
+          example: male
+        goodStudentInd:
+          description: Driver is a good student if driver's occupation is student
+            whose GPA is 3.0 or above.
+          type: boolean
+          example: true
+        hasServedMilitary:
+          description: Indicates whether driver has served in military
+          type: boolean
+        namedInsuredIndicator:
+          description: Indicator to identify named insureds
+          type: boolean
+        houseHoldResident:
+          description: Is driver house hold resident?
+          type: boolean
+          example: true
+        insuranceScoreBand:
+          description: Insurance Score Band, If provided, will use to determine Insurance
+            Score If not provided, will order Insurance Score Report
+          enum:
+          - Excellent
+          - Good
+          - Fair
+          - Poor
+          type: string
+          example: Excellent
+        insuranceScore:
+          description: Insurance Score
+          type: string
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        isSmoker:
+          description: Indicates whether the driver is smoker.
+          type: boolean
+          example: false
+        name:
+          "$ref": "#/components/schemas/Name"
+        maritalStatusCode:
+          description: Marital Status of the Driver - M for Married, S for Single,
+            D for Divorced, W for Widowed, P for Separated, C for Domestic partner
+          enum:
+          - M
+          - S
+          - D
+          - W
+          - P
+          - C
+          type: string
+          example: M
+        monthsAtEmployer:
+          description: Number Of months Person is with current employer
+          type: number
+          example: 36
+          pattern: "^[0-9]*$"
+        monthsAtResidence:
+          description: Number Of months the user lived in the current home in months
+          type: number
+          example: 36
+          pattern: "^[0-9]*$"
+        nationality:
+          description: Providers driver nationality. 01 for African-American, 02 for
+            American Indian or Alaskan Native, 03 for Asian or Pacific Islander, 07
+            for White, 08 for Latino, 09 for Other when selected additional field
+            displays, 10 for Information not provided by applicant.
+          type: string
+          enum:
+          - '01'
+          - '02'
+          - '03'
+          - '07'
+          - '08'
+          - '09'
+          - '10'
+        occupation:
+          description: Occupation of the driver
+          type: string
+          example: Accountant
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        phones:
+          type: array
+          items:
+            "$ref": "#/components/schemas/phones"
+        relationshipCode:
+          description: Relationship to Primary insured.If the person is primary insured,
+            relationshipCode will be self.
+          enum:
+          - Self
+          - Spouse
+          - Child
+          - Parent
+          - Other
+          - OtherRelative
+          - DomesticPartner
+          - Sibling
+          type: string
+          example: Self
+        rideShareIndicator:
+          description: Ride Share Indicator. Ride share requires the RIDESHARE coverage
+            to be added
+          type: boolean
+          example: true
+        smartDriverCourseInd:
+          description: Is driver taken any smart driving course
+          type: boolean
+          example: true
+        smartDriverCourseNumber:
+          description: smart driving course completion certificate number
+          type: string
+          example: A123456
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        smartDriverCourseCompletionDate:
+          description: smart driving course completion date YYYY-MM-DD
+          type: string
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2020-02-23'
+        travelLinkIndicator:
+          description: TravelLink Discount, TravelLink Discount for Delaware only
+          type: boolean
+          example: false
+        reports:
+          type: array
+          items:
+            "$ref": "#/components/schemas/report"
+    Vehicle:
+      description: Vehicle Details
+      additionalProperties: false
+      required:
+      - vehIdentificationNo
+      - partialVinInd
+      - vehicleId
+      type: object
+      properties:
+        vehicleId:
+          description: Vehicle id for the request, It should be unique for each Vehicle
+            to the request like V1/V2/V3
+          type: string
+          example: V1
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        objectId:
+          description: System generated object ID
+          type: string
+        annualMiles:
+          description: Annual mileage for the vehicle in miles
+          type: number
+          example: 8000
+          pattern: "^[0-9]*$"
+        antiLockBrakes:
+          description: Indicates whether the vehicle has anti lock breaks (ABS)
+          type: boolean
+        antiTheft:
+          description: Anti-Theft
+          enum:
+          - None
+          - Alarm
+          - VINETCH
+          - AutoDisable
+          - VRD
+          - NonPassiveAlarm
+          - PassiveAlarm
+          - TrackingDevice
+          - PassiveAndTracking
+          - HomingDevice
+          - Unknown
+          type: string
+          example: None
+        bodyType:
+          description: Vehicle Body Type
+          type: string
+          example: 4 Door
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        businessUsageDescription:
+          description: Business usage description. Required when vehicleUsageCode=Business
+          type: string
+          example: 4 Door
+          pattern: "^[a-z A-Z 0-9.&$#-\\\\-\\/_]{0,250}$"
+        commuteDaysPerWeek:
+          description: Number of days per week the vehicle is being used for commute
+          enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          type: number
+          example: 5
+        dayTimeRunningLights:
+          description: Indicates whether the vehicle has day time running lights
+          type: boolean
+        discounts:
+          type: array
+          items:
+            "$ref": "#/components/schemas/discounts"
+        driveLessThan1000:
+          description: Indicates whether the vehicle was driven less than 1000 miles
+          type: boolean
+        driverAssignments:
+          description: " Which Drivers assigned to this vehicle"
+          type: array
+          items:
+            "$ref": "#/components/schemas/DriverAssignment"
+        existingDamageIndicator:
+          description: Existing Damage Indicator.
+          type: string
+          example: None
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        garagingAddress:
+          "$ref": "#/components/schemas/Address"
+          description: 'Garaging address if residentialAddressInd = true. select addressTypeCd
+            = Garaging '
+        isRegisteredOwner:
+          description: Is registered Owner different from FNI (First Named Insured)
+            - true if yes, false, if registered owner and FNI are same. Only applicable
+            in CT
+          type: boolean
+        make:
+          description: make of the vehicle
+          type: string
+          example: Honda
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        model:
+          description: model of the vehicle
+          type: string
+          example: Pilot
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        milesOneWay:
+          description: Average one-way daily mileage for the vehicle in miles.
+          type: number
+          example: 12
+          pattern: "^[0-9]*$"
+        newVehicleIndicator:
+          description: is this a new vehicle
+          type: boolean
+          example: false
+        odometerReading:
+          description: Current mileage for the vehicle. Odometer reading in miles
+          type: number
+          example: 24000
+          pattern: "^[0-9]*$"
+        partialVinInd:
+          description: if Partail vin provided in vehIdentificationNo, send true for
+            this field or false
+          type: boolean
+          example: false
+        performanceModIndicator:
+          description: 'has vehicle modified to increase performance '
+          type: boolean
+          example: false
+        primaryOwnerName:
+          "$ref": "#/components/schemas/Name"
+          description: Only applicable in CT, if isRegisteredOwner is true
+        additionalOwnerName:
+          "$ref": "#/components/schemas/Name"
+          description: Only applicable in CT, if isRegisteredOwner is true
+        residentialAddressInd:
+          description: Garaging Address Different than Residential Address
+          type: boolean
+          example: true
+        salvageIndicator:
+          description: Salvage Indicator.
+          type: boolean
+          example: false
+        vehIdentificationNo:
+          description: Provide Full Vin or Partail VIN
+          type: string
+          example: JS2RC61H855303632
+          pattern: "^[a-z A-Z 0-9 *&$.\\-']{0,17}$"
+        vehicleOwnership:
+          type: object
+          additionalProperties: false
+          properties:
+            ownershipTypeCode:
+              enum:
+              - Owned
+              - Financed
+              - Leased
+              type: string
+              example: Owned
+            lienholderName:
+              description: only required if ownershipTypeCd is other than Own
+              type: string
+              example: Honda Finance
+              pattern: "^[a-z A-Z.\\-']{0,40}$"
+            lienholderAddress:
+              "$ref": "#/components/schemas/Address"
+              description: 'Address of the lineholder only required if lineholderName
+                is present select addressTypeCd = Business '
+              type: object
+        vehicleRegState:
+          description: Vehicle Registration State
+          maxLength: 2
+          type: string
+          pattern: "^[A-Z a-z]{2}$"
+          example: AZ
+        vehicleUsageCode:
+          description: Primary purpose of the vehicle
+          enum:
+          - Pleasure
+          - WorkCommute
+          - Business
+          - Farming
+          - Other
+          type: string
+          example: Pleasure
+        year:
+          description: Year of the vehicle
+          type: string
+          example: '2011'
+          pattern: "^[0-9]{0,4}$"
+        waiveLiability:
+          description: Waive liability coverage for the vehicle
+          type: boolean
+        vehicleCoverages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/vehicleCoverage"
+        airbags:
+          description: Air Bags
+          type: string
+          example: frontAndSide
+          enum:
+          - none
+          - driver
+          - front
+          - frontAndSide
+          - frontAndSideRearSide
+        hybrid:
+          description: Indicator for Hybrid Vehicle
+          type: boolean
+          example: false
+    QuestionsSet:
+      description: Questions set.
+      type: object
+      additionalProperties: false
+      properties:
+        answerCode:
+          description: Answer code.
+          type: string
+          pattern: "^[A-Z a-z .#$%*&0-9]{0,40}$"
+        answerText:
+          description: Answer text.
+          type: string
+          pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+        questionCode:
+          description: Question code.
+          type: string
+          pattern: "^[A-Z a-z .#$%*&0-9]{0,40}$"
+        questionText:
+          description: Question text.
+          type: string
+          pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,1500}$
+    report:
+      description: Report related information. Indicates placeholders for oredering
+        several reports, status of reports, expiration dates for reports.
+      type: object
+      additionalProperties: false
+      properties:
+        expirationDate:
+          "$ref": "#/components/schemas/expirationDate"
+        orderDate:
+          type: string
+          description: Provides the date when the reports were ordered.
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2020-11-24'
+        reorderDate:
+          type: string
+          description: Provides the date when the reports are to be reordered.
+          pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+          example: '2020-11-24'
+        reportType:
+          type: string
+          description: Indicates the type of the report.
+          enum:
+          - MVR
+          - CLUE
+          - NCF
+          - CurrentCarrier
+        status:
+          type: string
+          description: Indicates the status of the ordered reports
+          enum:
+          - Alert
+          - Success
+          - Not Found
+          - Not Ordered
+        statusReason:
+          type: string
+          description: Provides the reason for the status
+          pattern: ^[a-z A-Z 0-9 \".,\/\\*@#$%^']{0,100}$
+    premiums:
+      description: Premium related details
+      type: object
+      additionalProperties: false
+      required:
+      - premiumType
+      - premiumAmount
+      - payments
+      properties:
+        packageType:
+          type: string
+          description: Type of package the customer can choose from.
+          example: Dafault, Standard, Basic
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,20}$"
+        coverages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/premiumCoverage"
+        payments:
+          type: array
+          items:
+            "$ref": "#/components/schemas/PaymentOption"
+        premiumDetails:
+          type: array
+          items:
+            properties:
+              premiumType:
+                description: Premium type
+                type: string
+                pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+              premiumAmount:
+                description: Premium amount
+                type: number
+                pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+              paymentPlan:
+                "$ref": "#/components/schemas/paymentPlan"
+              totalPremiumAmount:
+                "$ref": "#/components/schemas/totalPremiumAmount"
+    discounts:
+      description: Discounts object the provides a glimpse of all the available and
+        applied discounts on the quote based on user's interest and eligibility.
+      type: object
+      additionalProperties: false
+      properties:
+        discountAppliedIndicator:
+          type: boolean
+          description: An indicator that indicates whether the discount is applied
+            or available. true indicates the discount is applied, false indicates
+            discount is available
+        discountCode:
+          type: string
+          example: AAA-DIS-PL-007
+          pattern: "^[a-z A-Z 0-9.(),\\-']{0,50}$"
+        discountDescription:
+          type: string
+          example: Group Affinity
+          pattern: "^[a-z A-Z 0-9.(),\\-']{0,100}$"
+        discountName:
+          type: string
+          example: AFFINITY PARTNER
+          pattern: "^[a-z A-Z 0-9.(),\\-']{0,50}$"
+        discountPercentage:
+          type: number
+          pattern: "^[. 0-9]*$"
+        discountPremium:
+          type: number
+          example: 10
+          pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+        discountSelectable:
+          type: boolean
+          description: An indicator that indicates whether the interest for the discount
+            can be explicitly provided or it will be implicitly applied based on VIN
+            report, user eligibility, or any other business rules
+        displayInUI:
+          type: boolean
+          description: An indicator to indicate whether the respective discount need
+            to be displayed or not
+        discountAttributes:
+          additionalProperties: false
+          type: array
+          items:
+            properties:
+              key:
+                description: Placeholder for the qualifiers associated with discounts.
+                type: string
+                enum:
+                - aarpNumber
+                - antitheft
+                - defensiveDriverCourseNumber
+                - defensiveDriverCourseCompletionDate
+                - emailUBIDriver
+                - membershipName
+                - membershipNumber
+                - membershipPlan
+                - mobilePhoneUBIDriver
+                - productType
+                - smartDriverCourseNumber
+                - smartDriverCourseCompletionDate
+              value:
+                description: Value corresponding to the qualifier mentioned in the
+                  key attribute
+                type: string
+                pattern: "^[a-z A-Z 0-9.(),*$&%#!+-\\\\-']{0,100}$"
+    miscellaneousFees:
+      description: Premium related details
+      additionalProperties: false
+      type: array
+      items:
+        properties:
+          miscellaneousFeeAmount:
+            description: Miscellaneous fee
+            type: number
+            pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+          miscellaneousFeeType:
+            description: Tax/Fee type. The values can be Tax, Fee.
+            type: string
+            example: Tax
+            pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+    APIResponse:
+      title: Success Response from API
+      description: Success response for quick quote
+      additionalProperties: false
+      type: object
+      properties:
+        id:
+          type: string
+          description: provides the resource identifier that uniquely identifies the
+            resourse. In this case, this id will carry the quote number from the quote
+            engine.
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        messages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/status"
+        metaData:
+          "$ref": "#/components/schemas/ReqMetaData"
+        autoPaySelected:
+          "$ref": "#/components/schemas/autoPaySelected"
+        effectiveDate:
+          "$ref": "#/components/schemas/effectiveDate"
+        elc:
+          "$ref": "#/components/schemas/elc"
+        eValueDiscountIndicator:
+          "$ref": "#/components/schemas/eValueDiscountIndicator"
+        expirationDate:
+          "$ref": "#/components/schemas/expirationDate"
+        optionalCoverageIndicator:
+          "$ref": "#/components/schemas/optionalCoverageIndicator"
+        orderInsuranceScore:
+          "$ref": "#/components/schemas/orderInsuranceScore"
+        orderCurrentCarrierReport:
+          "$ref": "#/components/schemas/orderCurrentCarrierReport"
+        packageSelection:
+          "$ref": "#/components/schemas/packageSelection"
+        paperlessIndicator:
+          "$ref": "#/components/schemas/paperlessIndicator"
+        policyNumber:
+          "$ref": "#/components/schemas/policyNumber"
+        policyTerm:
+          "$ref": "#/components/schemas/policyTerm"
+        postalCode:
+          "$ref": "#/components/schemas/postalCode"
+        productCode:
+          "$ref": "#/components/schemas/productCode"
+        productFamilyCode:
+          "$ref": "#/components/schemas/productFamilyCode"
+        productGroupCode:
+          "$ref": "#/components/schemas/productGroupCode"
+        quoteNumber:
+          "$ref": "#/components/schemas/quoteNumber"
+        quoteReferenceNumber:
+          "$ref": "#/components/schemas/quoteNumber"
+        quoteStatus:
+          description: Quote status returned by provider in response. Some of the
+            valid status are QuotedNotBound and NotQuotedNotBound.
+          type: string
+          example: QuotedNotBound
+          pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+        residenceType:
+          "$ref": "#/components/schemas/residenceType"
+        riskState:
+          "$ref": "#/components/schemas/riskState"
+        prebindDocument:
+          description: Additional information is a place holder to add any adhoc features
+            without impacting the existing customers.
+          type: object
+          "$ref": "#/components/schemas/prebindDocument"
+        consents:
+          type: array
+          items:
+            "$ref": "#/components/schemas/consent"
+        coverages:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Coverage"
+        currentCarrier:
+          "$ref": "#/components/schemas/CurrentCarrier"
+        discounts:
+          type: array
+          items:
+            "$ref": "#/components/schemas/discounts"
+        drivers:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Driver"
+        existingAAAPolicies:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ExistingPolicies"
+        miscellaneousFees:
+          "$ref": "#/components/schemas/miscellaneousFees"
+        partnerMemberships:
+          type: array
+          items:
+            "$ref": "#/components/schemas/MembershipInfo"
+        premiums:
+          type: array
+          items:
+            "$ref": "#/components/schemas/premiums"
+        primaryInsuredContactInfo:
+          "$ref": "#/components/schemas/Contact"
+        producer:
+          "$ref": "#/components/schemas/Producer"
+        provider:
+          "$ref": "#/components/schemas/provider"
+        vehicles:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Vehicle"
+        questions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/QuestionsSet"
+        reports:
+          type: array
+          items:
+            "$ref": "#/components/schemas/report"
+        thirdPartyDesignee:
+          "$ref": "#/components/schemas/thirdPartyDesignee"
+    totalPremiumAmount:
+      description: Total premium
+      type: number
+      example: 1400
+      pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+    downPayment:
+      description: Down payment
+      type: number
+      example: 200
+      pattern: "^\\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]*)(.[0-9][0-9])?$"
+    methodOfPayment:
+      description: " Selected Method of Payment"
+      enum:
+      - EFT
+      - CreditCard
+      - DebitCard
+      - ACH
+      type: string
+      example: EFT
+    expirationDate:
+      description: when current policy expires (YYYY-MM-DD)?
+      type: string
+      pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+      example: '2020-11-23'
+    policyNumber:
+      description: Current Carrier Policy Number
+      type: string
+      example: AZ123456770-01
+      pattern: "^[a-z A-Z 0-9.\\-_]{0,40}$"
+    paperlessIndicator:
+      description: Indicates whether paperless options are preferred.
+      type: boolean
+    autoPaySelected:
+      description: " Indicator to show if autopay is wanted"
+      type: boolean
+      example: true
+    effectiveDate:
+      description: Quote Effective Date YYYY-MM-DD, Date Must be >= current Date and
+        < 45 days from current date
+      type: string
+      pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+      example: '2020-11-14'
+    elc:
+      description: Extraordinary Life Circumstance. Only select states use this. Some
+        of the values are None, Decline, Cat - A catastrophic event, as declared by
+        the Federal or State Government, Illness - A serious illness or injury, or
+        a serious illness or injury to an immediate family member, Death - The death
+        of a spouse, child or parent, Divorce - Divorce or involuntary interruption
+        of legally-owed alimony or support payments, LostEmployment - Temporary loss
+        of employment for a period of 3 months or more, if it results from involuntary
+        termination, Military - Military deployment overseas, IDTheft - Identity theft,
+        Other - Other events, as determined by the insurer, Dissolution - Dissolution
+        of marriage or Credit information of a former spouse
+      type: string
+      enum:
+      - None
+      - Decline
+      - Cat
+      - Death
+      - Divorce
+      - LostEmployment
+      - Military
+      - IDTheft
+      - Other
+      - Dissolution
+    eValueDiscountIndicator:
+      description: Indicator to apply eValue discount; defaults to true in quick quote.
+        However discount will be applied only if the quote is found to be elgibile
+        to receive it.
+      type: boolean
+      example: true
+    inceptionDate:
+      description: Policy inception date in the format provided in example.
+      type: string
+      pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+      example: '2020-11-24'
+    inceptionYear:
+      description: Year when policy became effective.
+      type: string
+      example: '2020'
+      pattern: "^[0-9]{0,4}$"
+    insuranceScoreStatus:
+      description: Status of insurance score order
+      type: string
+      pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,20}$"
+    insuranceScoreReorderDate:
+      description: 'Date when insurance score must be reordered '
+      type: string
+      pattern: "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$"
+      example: '1990-01-31'
+    orderInsuranceScore:
+      description: Indicator to order insurance score, This data element should default
+        to false; if sent as true, insurance score report will be ordered as part
+        of the service
+      type: boolean
+      example: false
+    orderCurrentCarrierReport:
+      description: Indicator to order current carrier report and insurance score.
+        If sent as true, insurance score and current carrier report will be ordered
+        as part of the service
+      type: boolean
+      example: false
+    packageSelection:
+      description: " Package selected for coverages. This feature is not enabled yet."
+      type: string
+      example: basic
+      pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,20}$"
+    paymentPlan:
+      description: Payment Plan Selected for the new Policy - TBD
+      type: string
+      example: payInFull
+      enum:
+      - payInFull
+      - monthly
+      - quarterly
+      - semiAnnual
+      - lowDeposit
+    policyTerm:
+      description: Requested Policy Term, 6 or 12 (semi-annual or annual); if not
+        provided, will default to the product term
+      enum:
+      - 6
+      - 12
+      type: number
+      example: 12
+    postalCode:
+      description: Policy Postal Code, If Not provided defaults to residential address
+      type: string
+      example: '85303'
+      pattern: "^([0-9]{5}-[0-9]{4})$|^([0-9]{5})$"
+    quoteNumber:
+      description: Quote Number returned by Insurer in response
+      type: string
+      example: QAZSS123456987
+      pattern: "^[a-z A-Z 0-9.\\-_]{0,40}$"
+    residenceType:
+      description: Type of residence
+      enum:
+      - OWNHOME
+      - OWNCONDO
+      - RENT
+      type: string
+      example: OWNHOME
+    optionalCoverageIndicator:
+      description: True indicates that the customer is interested in receiving optional
+        coverages that are applicable beyond state mandatory coverages. This will
+        be the default behavior if this attribute is not passed in the request. Passing
+        False indicates that the customer is interested only in the coverages provided
+        along with any state mandatory coverages.
+      type: boolean
+      example: true
+    riskState:
+      description: Policy State Code, If Not provided defaults to residential address
+      maxLength: 2
+      type: string
+      pattern: "^[A-Z a-z]{2}$"
+      example: AZ
+    productFamilyCode:
+      description: Provides line of business. Highest level of product hierarchy.
+      type: string
+      example: Auto
+      pattern: "^[a-z A-Z 0-9_-]{0,20}$"
+    productCode:
+      description: Third level of product hierarchy. The allowed values could be choice
+        or signature series.
+      type: string
+      example: Choice
+      pattern: "^[a-z A-Z 0-9_-]{0,20}$"
+    productGroupCode:
+      description: Second level of product hierarchy.
+      type: string
+      example: Auto
+      pattern: "^[a-z A-Z 0-9_-]{0,20}$"
+    productType:
+      description: Same as productGroupCode. To indicate enumerations separately introduced
+        an additional attribute
+      type: string
+      enum:
+      - AUTO
+      - HOME
+      - CONDO
+      - RENTER
+      - LIFE
+      - WATERCRAFT
+      - RENTAL
+      - UMBRELLA
+    Fault:
+      description: Error Response from API
+      additionalProperties: false
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: generic error message description.
+        errors:
+          type: array
+          items:
+            properties:
+              messageCode:
+                type: string
+                description: error code
+                pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+              messageDescription:
+                type: string
+                description: Error message in detail.
+                pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+              relatedAttribute:
+                type: string
+                description: attribute name that needs to be corrected in order to
+                  avoid the validation error.
+                pattern: "^[a-z A-Z 0-9.-\\\\-\\/_]{0,40}$"
+    proofConfirmation:
+      description: Proofs related information. Set of boolean indicators for differnt
+        types of proofs.
+      type: object
+      additionalProperties: false
+      properties:
+        newCarPurchaseProof:
+          type: boolean
+          description: Proof of New Car purchase
+          example: false
+        newCarCoverageProof:
+          type: boolean
+          description: Proof of new car coverage
+          example: false
+        smartDriverProof:
+          type: boolean
+          description: Proof of Smart Driver
+          example: false
+        defensiveDriverProof:
+          type: boolean
+          description: Proof of DDD
+          example: false
+        goodStudentProof:
+          type: boolean
+          description: Proof of good student
+          example: false
+        antitheftDeviceProof:
+          type: boolean
+          description: Proof of anti-theft
+          example: false
+        priorInsuranceProof:
+          type: boolean
+          description: Proof of prior insurance
+          example: false
+        travelinkProof:
+          type: boolean
+          description: Proof of TravelLink
+          example: false
+x-amazon-apigateway-request-validators:
+  Validate body, query string parameters, and headers:
+    validateRequestParameters: true
+    validateRequestBody: true
