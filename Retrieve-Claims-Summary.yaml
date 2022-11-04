@@ -1,0 +1,1586 @@
+openapi: 3.0.2
+info:
+    title: Retrieve Claim Summaries
+    version: '2.0'
+    description: Interface for Claims API to retrieve claim summary from CAS for a given claim
+    contact:
+        email: dlapimavens@csaa.com
+servers:
+    -
+        url: 'https://api-dev.n01.csaa-insurance.aaa.com/{basePath}'
+        description: DEV
+        variables:
+            basePath:
+                default: v2-claims
+    -
+        url: 'https://api-qa.n01.csaa-insurance.aaa.com/{basePath}'
+        description: QA
+        variables:
+            basePath:
+                default: v2-claims
+    -
+        url: 'https://api-e2e.n01.csaa-insurance.aaa.com/{basePath}'
+        description: E2E
+        variables:
+            basePath:
+                default: v2-claims
+    -
+        url: 'https://api-perf.n01.csaa-insurance.aaa.com/{basePath}'
+        description: PERF
+        variables:
+            basePath:
+                default: v2-claims
+    -
+        url: 'https://api-stage.p01.csaa-insurance.aaa.com/{basePath}'
+        description: STAGE
+        variables:
+            basePath:
+                default: v2-claims
+    -
+        url: 'https://api.p01.csaa-insurance.aaa.com/{basePath}'
+        description: PROD
+        variables:
+            basePath:
+                default: v2-claims
+paths:
+    /api/v2/claims/summaries/health:
+        get:
+            tags:
+                - Health
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            examples:
+                                HealthSuccessResponse:
+                                    value:
+                                        status: OK
+                                        CASAutoClaimsSummariesHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    RetrieveAutoClaimsSummaries: OK
+                                        CASPropertyClaimsSummariesHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    RetrievePropertyClaimsSummaries: OK
+                                        KOFAXClaimsSummariesHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    RetrieveKOFAXClaimsSummaries: OK
+                                        secretManagerHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    csaa-apihub-nonprod-cas-cloud-creds: OK
+                                HealthFailResponse:
+                                    value:
+                                        status: fail
+                                        CASAutoClaimsSummariesHealth:
+                                            status: fail
+                                            details:
+                                                -
+                                                    RetrieveAutoClaimsSummaries: OK
+                                        CASPropertyClaimsSummariesHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    RetrievePropertyClaimsSummaries: OK
+                                        KOFAXClaimsSummariesHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    RetrieveKOFAXClaimsSummaries: OK
+                                        secretManagerHealth:
+                                            status: OK
+                                            details:
+                                                -
+                                                    csaa-apihub-nonprod-cas-cloud-creds: OK
+                    description: 200 response
+                '401':
+                    description: 401 response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                            examples:
+                                500ErrorExample:
+                                    value:
+                                        message: Internal Error
+                                        errors:
+                                            -
+                                                messageDescription: Internal Error
+                    description: 500 response
+            operationId: Retrieve Claims Summaries Health Check
+            summary: This API is used for retrieving an health of Retrieve Claims Summaries Lambda.
+            x-amazon-apigateway-integration:
+                httpMethod: POST
+                uri: ''
+                responses:
+                    default:
+                        statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+    /api/v2/claims/summaries/by-policy-number:
+        get:
+            tags:
+                - Retrieve By Policy Number
+            parameters:
+                -
+                    name: policyNumber
+                    description: policyNumber
+                    schema:
+                        maxLength: 20
+                        pattern: '^[A-Z a-z 0-9]{0,20}$'
+                        type: string
+                        example: CAAS207483283
+                    in: query
+                    required: true
+                -
+                    name: productType
+                    description: policy type
+                    schema:
+                        maxLength: 4
+                        pattern: '^[A-Z a-z]{0,4}$'
+                        type: string
+                        example: PA
+                    in: query
+                    required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveClaimSummariesResponse'
+                            examples:
+                                propertyClaimResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                policyNumber: CAAS102080168
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: theft_AAA
+                                                        causeSubType: ''
+                                                        claimDeductible: ''
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: >-
+                                                            someone broke in and stole his laptop, best buy
+                                                            card and 800 cash HO4/CA/500
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        policyNumber: CAAS102080168
+                                                        occupancyType: occupied
+                                                        isUnderSalavage: true
+                                                        policyInsureds:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                        coverages:
+                                                            amountPaid: 0
+                                                            deductible: 0
+                                                            type: ''
+                                                        insuredAddress:
+                                                            cityName: YUMA
+                                                            streetAddressLine1: 1001 JAZZ
+                                                            streetAddressLine2: ''
+                                                            isoRegionCode: AZ
+                                                            zipCode: '85365'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            workTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                                autoClaimResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                policyNumber: AZH3201035764
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: HOME
+                                                        policyNumber: AZH3201035764
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateOfBirth: '2022-01-01'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            telephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 200 OK
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 Response
+                '404':
+                    content:
+                        application/json:
+                            examples:
+                                '404':
+                                    value:
+                                        message: Not Found
+                                        errors:
+                                            -
+                                                messageDescription: Claims Not Found
+                    description: 404 Response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                            examples:
+                                500ErrorResponse:
+                                    value:
+                                        message: Internal Error
+                                        errors:
+                                            -
+                                                messageDescription: Internal Error
+                    description: 500 Response
+            security:
+                -
+                    csaaapihubClaimsRetrievalAPIoktaAuthorizer: []
+            summary: get claim summaries for a policy
+            x-amazon-apigateway-request-validator: 'query string parameters, and headers'
+            x-amazon-apigateway-gateway-responses:
+                BAD_REQUEST_BODY:
+                    statusCode: 400
+                    responseTemplates:
+                        application/json: |-
+                            {
+                            "message":$context.error.messageString,
+                            "validationErrorString":"$context.error.validationErrorString"
+                            }
+            x-amazon-apigateway-integration:
+                httpMethod: GET
+                uri: ''
+                responses:
+                    default:
+                        statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RetrieveClaimSummariesRequestByPolicyNumbers'
+                        examples:
+                            Example:
+                                value:
+                                    policies:
+                                        -
+                                            policyNumber: OKSS201035457
+                                            productType: PA
+                                        -
+                                            policyNumber: KSD3201036921
+                                            productType: HO
+                                        -
+                                            policyNumber: CAPU201037059
+                                            productType: PU
+            tags:
+                - Retrieve By Policy Number
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveClaimSummariesResponse'
+                            examples:
+                                autoClaimResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                policyNumber: CAAS102080168
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateTimeOfBirth: '2022-01-01T11:00:00.000Z'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                                propertyClaimResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                policyNumber: CAAS102080168
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: theft_AAA
+                                                        causeSubType: ''
+                                                        claimDeductible: ''
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: >-
+                                                            someone broke in and stole his laptop, best buy
+                                                            card and 800 cash HO4/CA/500
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        policyNumber: CAAS102080168
+                                                        occupancyType: occupied
+                                                        isUnderSalavage: true
+                                                        policyInsureds:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                        coverages:
+                                                            amountPaid: 0
+                                                            deductible: 0
+                                                            type: ''
+                                                        insuredAddress:
+                                                            cityName: YUMA
+                                                            streetAddressLine1: 1001 JAZZ
+                                                            streetAddressLine2: ''
+                                                            isoRegionCode: AZ
+                                                            zipCode: '85365'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 200 OK Response
+                '206':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveClaimSummariesResponse'
+                            examples:
+                                PolicyNumberPartialResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                policyNumber: CAAS102080167
+                                                fault:
+                                                    message: Not Found
+                                                    errors:
+                                                        -
+                                                            messageDescription: No claims found
+                                            -
+                                                policyNumber: CAAS102080168
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateOfBirth: '2022-01-01'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 206 Response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                    description: 400 Bad Request
+                '404':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                            examples:
+                                404 Response:
+                                    value:
+                                        message: Not Found
+                                        errors:
+                                            -
+                                                messageDescription: Claims Code Not Found
+                    description: '404'
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorResponse'
+                    description: 500 Response
+            security:
+                -
+                    csaaapihubClaimsRetrievalAPIoktaAuthorizer: []
+            x-amazon-apigateway-request-validator: Validate body
+            x-amazon-apigateway-gateway-responses:
+                BAD_REQUEST_BODY:
+                    statusCode: 400
+                    responseTemplates:
+                        application/json: |-
+                            {
+                            "message":$context.error.messageString,
+                            "validationErrorString":"$context.error.validationErrorString"
+                            }
+            x-amazon-apigateway-integration:
+                httpMethod: POST
+                uri: ''
+                responses:
+                    default:
+                        statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+    /api/v2/claims/summaries/by-claim-number:
+        get:
+            tags:
+                - Retrieve By Claim Number
+            parameters:
+                -
+                    name: claimNumber
+                    description: Claim Number
+                    schema:
+                        maxLength: 20
+                        pattern: '^[0-9 -]{0,20}$'
+                        type: string
+                        example: 1000-00-0034
+                    in: query
+                    required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveSummariesResponseByClaim'
+                            examples:
+                                RetrieveByClaimNumberResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                claimNumber: 1004-54-2812
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        policyInsureds:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 508 Vidal Dr
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        exposure:
+                                                                            exposureIdentifier: 'cc:11794618'
+                                                                            exposureType: VehicleDamage
+                                                                            exposureStatus: Open
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            adjusterIdentifier: abc7def
+                    description: 200 OK Response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 Response
+                '404':
+                    content:
+                        application/json:
+                            examples:
+                                404ErrorResponse:
+                                    value:
+                                        message: Not Found
+                                        errors:
+                                            -
+                                                messageDescription: Claims Not Found
+                    description: 404 Response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                            examples:
+                                500ErrorResponse:
+                                    value:
+                                        message: Internal Error
+                                        errors:
+                                            -
+                                                messageDescription: Internal Error
+                    description: 500 Response
+            security:
+                -
+                    csaaapihubClaimsRetrievalAPIoktaAuthorizer: []
+            x-amazon-apigateway-request-validator: 'query string parameters, and headers'
+            x-amazon-apigateway-gateway-responses:
+                BAD_REQUEST_BODY:
+                    statusCode: 400
+                    responseTemplates:
+                        application/json: |-
+                            {
+                            "message":$context.error.messageString,
+                            "validationErrorString":"$context.error.validationErrorString"
+                            }
+            x-amazon-apigateway-integration:
+                httpMethod: GET
+                uri: ''
+                responses:
+                    default:
+                        statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+    /api/v2/claims/summaries/by-driver-license:
+        get:
+            tags:
+                - Retrieve By Driver License
+            parameters:
+                -
+                    name: licenseNumber
+                    description: Drivers license number
+                    schema:
+                        maxLength: 20
+                        pattern: '^[A-Z a-z 0-9]{0,20}$'
+                        type: string
+                        example: D123456
+                    in: query
+                    required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveSummariesResponseByDriverLicense'
+                            examples:
+                                RetrieveByLicenseResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                driverLicense: D4153111
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateOfBirth: '2022-01-01'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 200 OK Response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 Response
+                '404':
+                    content:
+                        application/json:
+                            examples:
+                                404ErrorResponse:
+                                    value:
+                                        message: Not Found
+                                        errors:
+                                            -
+                                                messageDescription: Claims Not Found
+                    description: 404 Response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                            examples:
+                                500ErrorResponse:
+                                    value:
+                                        message: Internal Error
+                                        errors:
+                                            -
+                                                messageDescription: Internal Error
+                    description: 500 Response
+            security:
+                -
+                    csaaapihubClaimsRetrievalAPIoktaAuthorizer: []
+            x-amazon-apigateway-request-validator: 'query string parameters, and headers'
+            x-amazon-apigateway-gateway-responses:
+                BAD_REQUEST_BODY:
+                    statusCode: 400
+                    responseTemplates:
+                        application/json: |-
+                            {
+                            "message":$context.error.messageString,
+                            "validationErrorString":"$context.error.validationErrorString"
+                            }
+            x-amazon-apigateway-integration:
+                httpMethod: GET
+                uri: ''
+                responses:
+                    default:
+                        statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/retrieveMultiClaimSummariesRequestByDriverLicenses'
+                        examples:
+                            RetrieveByDriverLicensesResponse:
+                                value:
+                                    driverLicenses:
+                                        -
+                                            licenseNumber: N123456
+                                        -
+                                            licenseNumber: D123456
+                                    fromDateTime: '2022-01-01T12:00:00-07:00'
+                                    toDateTime: '2022-03-01T12:00:00-07:00'
+                required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveSummariesResponseByDriverLicense'
+                            examples:
+                                DriverLicenseResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                driverLicense: D4153111
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateOfBirth: '2022-01-01'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 200 OK Response
+                '206':
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    summaries:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/retrieveSummariesResponseByDriverLicense'
+                            examples:
+                                DriverLicensePartialResponse:
+                                    value:
+                                        summaries:
+                                            -
+                                                driverLicense: D4153112
+                                                fault:
+                                                    message: Not Found
+                                                    errors:
+                                                        -
+                                                            messageDescription: No claims found
+                                            -
+                                                driverLicense: D4153111
+                                                claims:
+                                                    -
+                                                        claimNumber: 1004-54-2812
+                                                        dataSource: CC
+                                                        dateTimeOfLoss: '2022-01-01T11:00:00.000Z'
+                                                        status: Open
+                                                        cause: rearEndCollision_AAA
+                                                        openDateTime: '2022-01-01T11:00:00.000Z'
+                                                        closeDateTime: '2022-01-01T11:00:00.000Z'
+                                                        reportedDateTime: '2022-01-01T11:00:00.000Z'
+                                                        totalPaid: 124.6
+                                                        typeOfLoss: B
+                                                        description: ''
+                                                        inSubrogation: 'N'
+                                                        catastropheCode: ''
+                                                        faultPercentage: 100
+                                                        liabilityCode: E
+                                                        atFault: true
+                                                        type: AUTO
+                                                        policyNumber: CAAS102080168
+                                                        insuredVehicle:
+                                                            make: toyota
+                                                            model: camry
+                                                            bodyType: sedan
+                                                            manufacturedYear: 1999
+                                                            serialNumber: ''
+                                                            odometerReading: 1234567
+                                                            driver:
+                                                                name:
+                                                                    fullName: John Smith
+                                                                drivingLicenseNumber: D4153111
+                                                                drivingLicenseState: CA
+                                                                age: 36
+                                                                relationToNamedInsured: I
+                                                                dateOfBirth: '2022-01-01'
+                                                                permissiveUse: 'Y'
+                                                            involvedCoverages:
+                                                                -
+                                                                    coverageType: COLL
+                                                                    amountPaid: 100.6
+                                                                    validatedInjury: 'Y'
+                                                        claimants:
+                                                            -
+                                                                name:
+                                                                    fullName: John Smith
+                                                                address:
+                                                                    cityName: San Francisco
+                                                                    zipCode: 94132-2143
+                                                                    streetAddressLine: 111 Vidal Dr
+                                                                    streetAddressLine2: ''
+                                                                    isoCountryCode: US
+                                                                    isoRegionCode: CA
+                                                                    type: mailing_AAA
+                                                                involvedCoverages:
+                                                                    -
+                                                                        coverageType: COLL
+                                                                        amountPaid: 100.6
+                                                                        validatedInjury: 'Y'
+                                                        adjuster:
+                                                            name: Adam Wheeler
+                                                            homeTelephoneNumber: '4057531111'
+                                                            mobileTelephoneNumber: '4057531111'
+                                                            adjusterIdentifier: abc7def
+                                                            emailAddress: abc.def@csaa.com
+                    description: 206 Partial Content Response
+                '400':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 400 Response
+                '404':
+                    description: 404 Not Found Response
+                '500':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Fault'
+                    description: 500 Response
+            security:
+                -
+                    csaaapihubClaimsRetrievalAPIoktaAuthorizer: []
+            x-amazon-apigateway-request-validator: Validate body
+            x-amazon-apigateway-integration: {}
+components:
+    schemas:
+        policyInsureds:
+            type: object
+            properties:
+                name:
+                    type: object
+                    properties:
+                        fullName:
+                            description: full name
+                            type: string
+                address:
+                    $ref: '#/components/schemas/address'
+                    type: object
+        claimants:
+            type: object
+            properties:
+                name:
+                    type: object
+                    properties:
+                        fullName:
+                            description: full name
+                            type: string
+                address:
+                    $ref: '#/components/schemas/address'
+                    type: object
+                involvedCoverages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/involvedCoveragesResponse'
+        insuredAddress:
+            type: object
+            properties:
+                cityName:
+                    description: city name
+                    type: string
+                zipCode:
+                    description: zip code
+                    type: string
+                streetAddressLine1:
+                    description: streetAddressLine1
+                    type: string
+                streetAddressLine2:
+                    description: streetAddressLine2
+                    type: string
+                isoRegionCode:
+                    description: Region Code in ISO standard
+                    type: string
+                isUnderSalavage:
+                    description: if the claim is under salvage process
+                    type: string
+        retrieveMultiClaimSummariesRequest:
+            title: retrieveMultiClaimSummariesRequest
+            description: ''
+            type: object
+            properties:
+                policies:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            policyNumber:
+                                type: string
+                            productType:
+                                type: string
+                driverLicenses:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            licenseNumber:
+                                maxLength: 20
+                                pattern: '^[A-Z a-z 0-9]{0,20}$'
+                                type: string
+                                example: D123456
+                            issuedState:
+                                maxLength: 10
+                                pattern: '^[A-Z a-z 0-9]{0,10}$'
+                                type: string
+                                example: CA
+            example:
+                policies:
+                    -
+                        policyNumber: some text
+                        productType: PA
+                    -
+                        policyNumber: some text
+                        productType: HO
+                driverLicenses:
+                    -
+                        licenseNumber: some text
+                        issuedState: PA
+                    -
+                        licenseNumber: some text
+                        issuedState: HO
+        Fault:
+            title: Fault
+            description: ''
+            type: object
+            properties:
+                message:
+                    type: string
+            example:
+                message: Bad request
+        insuredVehicle:
+            type: object
+            properties:
+                make:
+                    description: Vehicle Make
+                    type: string
+                model:
+                    description: Vehicle model
+                    type: string
+                bodyType:
+                    description: Vehicle bodyType
+                    type: string
+                manufacturedYear:
+                    description: Vehicle manufactured Year
+                    type: string
+                serialNumber:
+                    description: Vehicle serial Number
+                    type: string
+                odometerReading:
+                    description: Vehicle odometer Reading
+                    type: integer
+                name:
+                    type: object
+                    properties:
+                        fullName:
+                            description: full name
+                            type: string
+                drivingLicenseNumber:
+                    description: driving License Number
+                    type: string
+                drivingLicenseState:
+                    description: driving License State
+                    type: string
+                age:
+                    description: drivers age
+                    type: string
+                relationToNamedInsured:
+                    description: drivers relation To Named Insured
+                    type: string
+                dateOfBirth:
+                    description: drivers dateOfBirth
+                    type: string
+                permissiveUse:
+                    description: is driver eligible for permissiveUse
+                    type: string
+        retrieveClaimSummariesResponse:
+            properties:
+                policyNumber:
+                    type: string
+                claims:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/retrieveClaimSummariesResponseObject'
+        retrieveMultiClaimSummariesRequestByDriverLicenses:
+            title: retrieveMultiClaimSummariesRequestByDriverLicenses
+            description: ''
+            type: object
+            properties:
+                driverLicenses:
+                    maxItems: 10
+                    minItems: 1
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DirverLicensesRequest'
+                fromDateTime:
+                    pattern: >-
+                        ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+                    type: string
+                    example: '2021-11-11T11:01:59-07:00'
+                toDateTime:
+                    pattern: >-
+                        ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+                    type: string
+                    example: '2021-11-11T11:01:59-07:00'
+            example:
+                driverLicenses:
+                    -
+                        licenseNumber: N123456
+                    -
+                        licenseNumber: D123456
+                fromDateTime: '2022-01-01T12:00:00-07:00'
+                toDateTime: '2022-03-01T12:00:00-07:00'
+        involvedCoveragesResponse:
+            type: object
+            properties:
+                coverageType:
+                    description: coverageType
+                    type: string
+                amountPaid:
+                    description: amountPaid
+                    type: integer
+                validatedInjury:
+                    description: validatedInjury
+                    type: string
+                exposure:
+                    type: object
+                    properties:
+                        exposureIdentifier:
+                            description: exposureIdentifier
+                            type: string
+                        exposureType:
+                            description: exposureIdentifier
+                            type: string
+                        exposureStatus:
+                            description: exposureIdentifier
+                            type: string
+        RetrieveClaimSummariesRequestByPolicyNumbers:
+            title: RetrieveClaimSummariesRequestByPolicyNumbers
+            description: ''
+            type: object
+            properties:
+                policies:
+                    maxItems: 10
+                    minItems: 1
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PoliciesRequest'
+                fromDateTime:
+                    pattern: >-
+                        ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+                    type: string
+                    example: '2021-11-11T11:01:59-07:00'
+                toDateTime:
+                    pattern: >-
+                        ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+                    type: string
+                    example: '2021-11-11T11:01:59-07:00'
+            example:
+                policies:
+                    -
+                        policyNumber: CAAS207483283
+                        productType: PA
+                    -
+                        policyNumber: CAAS207483283
+                        productType: HO
+                fromDateTime: '2022-01-01T12:00:00-07:00'
+                toDateTime: '2022-03-01T04:00:00-07:00'
+        DirverLicensesRequest:
+            title: DirverLicensesRequest
+            description: ''
+            required:
+                - licenseNumber
+            type: object
+            properties:
+                licenseNumber:
+                    maxLength: 20
+                    pattern: '^[A-Z a-z 0-9]{0,20}$'
+                    type: string
+                    example: D123456
+            example:
+                licenseNumber: N4216416
+        retrieveSummariesResponseByClaim:
+            properties:
+                claimNumber:
+                    type: string
+                claims:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/retrieveClaimSummariesResponseObject'
+        retrieveSummariesResponseByDriverLicense:
+            properties:
+                driverLicense:
+                    type: string
+                claims:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/retrieveClaimSummariesResponseObject'
+        PoliciesRequest:
+            title: PoliciesRequest
+            description: ''
+            required:
+                - policyNumber
+                - productType
+            type: object
+            properties:
+                policyNumber:
+                    maxLength: 20
+                    pattern: '^[A-Z a-z 0-9]{0,20}$'
+                    type: string
+                productType:
+                    maxLength: 4
+                    pattern: '^[A-Z a-z]{0,4}$'
+                    enum:
+                        - PA
+                        - HO
+                        - PU
+                    type: string
+            example:
+                policyNumber: CAAS207483283
+                productType: PA
+        retrieveClaimSummariesResponseObject:
+            type: object
+            properties:
+                claimNumber:
+                    description: claim number
+                    type: string
+                dataSource:
+                    description: data source
+                    type: string
+                dateTimeOfLoss:
+                    description: date of loss
+                    type: string
+                status:
+                    description: claim status
+                    type: string
+                cause:
+                    description: cause of incident
+                    type: string
+                openDateTime:
+                    description: claim open Date
+                    type: string
+                closeDateTime:
+                    description: claim close Date
+                    type: string
+                reportedDateTime:
+                    description: claim reported Date
+                    type: string
+                totalPaid:
+                    description: total amount paid
+                    type: string
+                typeOfLoss:
+                    description: type Of Loss
+                    type: string
+                description:
+                    description: description
+                    type: string
+                inSubrogation:
+                    description: ''
+                    type: string
+                catastropheCode:
+                    description: catastrophe code
+                    type: string
+                faultPercentage:
+                    description: Fault Percentage
+                    type: string
+                liabilityCode:
+                    description: liability code
+                    type: string
+                atFault:
+                    description: ''
+                    type: string
+                type:
+                    description: Policy Type
+                    type: string
+                policyNumber:
+                    description: policyNumber
+                    type: string
+                underlyingProduct:
+                    description: Underlying Product for a PU policy
+                    enum:
+                        - auto_AAA
+                        - pup_AAA
+                        - motorcycle_AAA
+                        - watercraft_AAA
+                    type: string
+                policyInsureds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/policyInsureds'
+                insuredAddress:
+                    $ref: '#/components/schemas/insuredAddress'
+                    type: object
+                insuredVehicle:
+                    $ref: '#/components/schemas/insuredVehicle'
+                    type: object
+                claimants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/claimants'
+                adjuster:
+                    $ref: '#/components/schemas/adjuster'
+                    type: object
+        ErrorResponse:
+            title: ErrorResponse
+            description: Error Response Message structure
+            type: object
+            properties:
+                message:
+                    type: string
+                errors:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            messageDescription:
+                                type: string
+            example:
+                message: Not Found
+                errors:
+                    -
+                        messageDescription: Claims Code Not Found
+        adjuster:
+            type: object
+            properties:
+                name:
+                    description: name
+                    type: string
+                homeTelephoneNumber:
+                    description: home telephoneNumber
+                    type: string
+                mobileTelephoneNumber:
+                    description: mobile Telephone number
+                    type: string
+                workTelephoneNumber:
+                    description: work Telephone number
+                    type: string
+                adjusterIdentifier:
+                    description: adjusterIdentifier
+                    type: string
+                emailAddress:
+                    description: emailAddress
+                    type: string
+        address:
+            type: object
+            properties:
+                cityName:
+                    description: city name
+                    type: string
+                zipCode:
+                    description: zip code
+                    type: string
+                streetAddressLine1:
+                    description: streetAddressLine1
+                    type: string
+                streetAddressLine2:
+                    description: streetAddressLine2
+                    type: string
+                isoCountryCode:
+                    description: Country Code in ISO standard.
+                    type: string
+                isoRegionCode:
+                    description: Region Code in ISO standard
+                    type: string
+                type:
+                    description: mailing type
+                    type: string
+    securitySchemes:
+        csaaapihubClaimsRetrievalAPIoktaAuthorizer:
+            type: apiKey
+            name: Authorization
+            in: header
+            x-amazon-apigateway-authtype: custom
+            x-amazon-apigateway-authorizer:
+                authorizerUri: ''
+                authorizerResultTtlInSeconds: 300
+                identityValidationExpression: Bearer.*
+                type: token
+x-amazon-apigateway-request-validators:
+    'query string parameters, and headers':
+        validateRequestParameters: true
+    Validate body:
+        validateRequestBody: true

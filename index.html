@@ -11,7 +11,11 @@
             window.onload = function () {
                 // Begin Swagger UI call region
                 const ui = SwaggerUIBundle({
-                    url: "openapi.yaml", //Location of Open API spec in the repo
+                    urls: [   
+                         { url: "adjuster-supervisor-info", name: "Supervisor Info" },  
+                         { url: "Retrieve-Claims-Summary.yaml", name: "Weather" }  
+                        ],                     
+
                     dom_id: '#swagger-ui',
                     deepLinking: true,
                     presets: [
