@@ -1,0 +1,2325 @@
+openapi: 3.0.1
+info:
+  title: Claims API
+  version: '2.0'
+  description: >-
+    This API enables working with claims. <br> <br> <u><b>Way to invoke the
+    API</b></u> <br> 1. Invoke security token API with relevant client id and
+    client secret for authorization token. As a best practice, it is suggested
+    to cache the authorization token at the client end till the token expires.
+    Token expiry can be found at "expires_in" attribute of the token API
+    response. "expires_in" is in milliseconds.  <br> 2. Use the authorization
+    token as the bearer token to invoke the claim API with relevant payload.
+    Expired token usage will result in 401.</br> 3. To invoke the API, a minimum
+    of TLSv1.2 protocol has to be used. 
+servers:
+  - url: https://api-dev.n01.csaa-insurance.aaa.com/{basePath}
+    description: DEV
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-qa.n01.csaa-insurance.aaa.com/{basePath}
+    description: QA
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-e2e.n01.csaa-insurance.aaa.com/{basePath}
+    description: E2E
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-perf.n01.csaa-insurance.aaa.com/{basePath}
+    description: PERF
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-appsec.n01.csaa-insurance.aaa.com/{basePath}
+    description: APPSEC
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-stage.p01.csaa-insurance.aaa.com/{basePath}
+    description: STAGE
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api.p01.csaa-insurance.aaa.com/{basePath}
+    description: PROD
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-dev.private.np.aws.csaa.pri/{basePath}
+    description: DEV - Private
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-qa.private.np.aws.csaa.pri/{basePath}
+    description: QA - Private
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-e2e.private.np.aws.csaa.pri/{basePath}
+    description: E2E - Private
+    variables:
+      basePath:
+        default: v2-claims
+  - url: https://api-perf.private.np.aws.csaa.pri/{basePath}
+    description: PERF - Private
+    variables:
+      basePath:
+        default: v2-claims
+paths:
+  /api-proxy/v2/claims/health:
+    get:
+      summary: Claims API Health Check
+      tags:
+        - Proxy API Health Check
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  components:
+                    type: object
+                description: Health Check status
+              example: 
+                status : OK
+          description: 200 response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/health:
+    get:
+      summary: Claims API Health Check
+      tags:
+        - Claims API Health Check
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  components:
+                    type: object
+                description: Health Check status
+              example: 
+                status: OK
+                components:
+                  snowflakeDB:
+                    status: OK
+                    details:
+                      - CLM_HST_ALL.D_CLAIM_EMPLOYEE: OK
+                  casClaimsSummariesByClaimNoAPI:
+                    status: OK
+                    details:
+                      - https://cc-qa-iegroup.insu.dev-1.us-east-1.guidewire.net/rest/aaa/claimsummaryAPI/Claim: OK
+                  casClaimsSummariesByPolicyNoAPI:
+                    status: OK
+                    details:
+                      - https://cc-qa-iegroup.insu.dev-1.us-east-1.guidewire.net/rest/aaa/claimsummaryAPI/Claim: OK
+                  casAutoClaimsLossSummariesAPI:
+                    status: OK
+                    details:
+                      - https://cc-dev-iegroup.insu.dev-1.us-east-1.guidewire.net/ws/aaa/webservices/losssummary/ClaimLossSummaryAPI_AAA/soap11: OK
+                  casPropertyClaimsLossSummariesAPI:
+                    status: OK
+                    details:
+                      - https://cc-dev-iegroup.insu.dev-1.us-east-1.guidewire.net/ws/aaa/webservices/holosssummary/ClaimLossSummaryHOAPI_AAA/soap11: OK
+                  kofaxSummariesAPI:
+                    status: OK
+                    details:
+                      - https://cc-dev-iegroup.insu.dev-1.us-east-1.guidewire.net/ws/aaa/webservices/documentmanagement/documentindexing/DocumentIndexingAPI_AAA/soap11: OK
+                  secretManager:
+                    status: OK
+                    details:
+                      - csaa-apihub-nonprod-cas-cloud-creds: OK
+                
+          description: 200 response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api-proxy/v2/claims/retrieve-predictive-claims:
+    post:
+      tags:
+        - Predictive Claims
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: backEnd_env
+          in: query
+          description: Back end envinment
+          required: false
+          schema:
+            type: string
+            example: qa4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetrievePredictiveClaimsRequest'
+            example:
+              ani: '0626322032'
+              customerId: '12345643'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  predictiveCustomer:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/claimsList'
+              example:
+                predictiveCustomer:
+                  claimsList:
+                    - adjWorkPhone: 6875484463 x1264012
+                      adjEmployeeStatus: Active
+                      claimPolicyNo: PASS204649886
+                      adjAvail: atwork
+                      adjExtension: '1264012'
+                      daysSinceOpened: 0
+                      claimLobType: AUTO
+                      claimNumber: 1001-79-5310
+                      claimStatus: OPEN
+                      associatedAniNumbers: >-
+                        (724) 467-6140,2671063513,(423) 870-8803,(860)
+                        357-0307,0370301187,4672378675,7571762134,8732445450,8810235103,1310236030,(380)
+                        200-1221,(360) 584-7075,(402) 760-8117,0464251538,(361)
+                        217-1117,664-681-5674,1006146402,7550333053,(575)
+                        816-8356,(337) 358-3074,(412)
+                        652-7260,3351623032,4771040611,2350616070,(808)
+                        744-8024,(804)
+                        816-0743,6385018628,3746788503,8701154050,0087081011,5321753208,5267144214,0673848322,5211120074,8181073202,(775)
+                        307-8466,(202) 833-1647,0626322032
+          description: 200 OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Invalid request body
+                errors:
+                  - messageCode: '400'
+                    messageDescription: '[object has missing required properties (["ani"])]'
+                    relatedAttribute: ''
+          description: 400 Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: resource not found / service might be not available
+          description: 403 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Not Found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+      summary: This API can be used as a wrapper for C360 predictive claims API to get claim details associated with ANI
+  /api-proxy/v2/claims/update-predictive-claims:
+    post:
+      tags:
+        - Predictive Claims
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: backEnd_env
+          in: query
+          description: Back end envinment
+          required: false
+          schema:
+            type: string
+            example: qa4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePredictiveClaimsRequest'
+            example:
+              claimsList:
+                - claimNumber: 1004-18-1617
+                  offerStatus: ACCEPTED
+                - claimNumber: 1004-18-0031
+                  offerStatus: DECLINED
+                - claimNumber: 1004-18-0026
+                  offerStatus: 'NULL'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePredictiveClaimsResponse'
+              example:
+                message: Success
+          description: 200 OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Invalid request body
+                errors:
+                  - messageCode: '400'
+                    messageDescription: '[object has missing required properties (["claimNumber"])]'
+                    relatedAttribute: ''
+          description: 400 Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: resource not found / service might be not available
+          description: 403 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Not Found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+      summary: This API can be used as a wrapper for C360 predictive claims API to get claim details associated with ANI
+  /api/v2/claims/loss-summaries/by-driver-license:
+    get:
+      tags:
+        - Retrieve Claim Loss Summaries By Driver License
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: licenseNumber
+          description: Drivers license number
+          schema:
+            maxLength: 20
+            pattern: ^[A-Z a-z 0-9]{0,20}$
+            type: string
+            example: D16
+          in: query
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByDriverLicenseResponse
+              examples:
+                RetrieveByLicenseResponse:
+                  value:
+                    summaries:
+                      - driverLicense: '9008469'
+                        claims:
+                          - claimNumber: 1004-53-0214
+                            dataSource: CC
+                            dateTimeOfLoss: '2021-12-01T07:00:00.000Z'
+                            status: open
+                            cause: animal
+                            openDateTime: '2022-04-13T11:21:08.996Z'
+                            reportedDateTime: '2022-04-13T11:19:37.130Z'
+                            totalPaid: 0
+                            typeOfLoss: 'N'
+                            description: Test
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            liabilityCode: C
+                            atFault: false
+                            type: AUTO
+                            policyNumber: ORSS201036249
+                            insuredVehicle:
+                              make: VOLVO
+                              model: S60
+                              manufacturedYear: '2012'
+                              serialNumber: YV1622FS2C2048448
+                              odometerReading: 0
+                              driver:
+                                name:
+                                  fullName: PPORRIDGE PEACE
+                                drivingLicenseNumber: '9008469'
+                                drivingLicenseState: OR
+                                age: '60'
+                                relationToNamedInsured: self
+                                dateTimeOfBirth: '1961-05-03T07:00:00.000Z'
+                            adjuster:
+                              name: nannann znnnann
+                              emailAddress: Cdhezzs.Ldorhfc@rwib.yvs
+                              workTelephoneNumber: '6136100284'
+          description: 200 OK Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+          description: 400 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+    post:
+      tags:
+        - Retrieve Claim Loss Summaries By Driver License
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/retrieveClaimSummariesByDriverLicenseRequest
+            examples:
+              RetrieveByDriverLicensesResponse:
+                value:
+                  driverLicenses:
+                    - licenseNumber: N123456
+                    - licenseNumber: D123456
+                  fromDateTime: '2022-01-01T12:00:00-07:00'
+                  toDateTime: '2022-03-01T12:00:00-07:00'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByDriverLicenseResponse
+              examples:
+                DriverLicenseResponse:
+                  value:
+                    summaries:
+                      - driverLicense: '9008469'
+                        claims:
+                          - claimNumber: 1004-53-0214
+                            dataSource: CC
+                            dateTimeOfLoss: '2021-12-01T07:00:00.000Z'
+                            status: open
+                            cause: animal
+                            openDateTime: '2022-04-13T11:21:08.996Z'
+                            reportedDateTime: '2022-04-13T11:19:37.130Z'
+                            totalPaid: 0
+                            typeOfLoss: 'N'
+                            description: Test
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            liabilityCode: C
+                            atFault: false
+                            type: AUTO
+                            policyNumber: ORSS201036249
+                            insuredVehicle:
+                              make: VOLVO
+                              model: S60
+                              manufacturedYear: '2012'
+                              serialNumber: YV1622FS2C2048448
+                              odometerReading: 0
+                              driver:
+                                name:
+                                  fullName: PPORRIDGE PEACE
+                                drivingLicenseNumber: '9008469'
+                                drivingLicenseState: OR
+                                age: '60'
+                                relationToNamedInsured: self
+                                dateTimeOfBirth: '1961-05-03T07:00:00.000Z'
+                            adjuster:
+                              name: nannann znnnann
+                              emailAddress: Cdhezzs.Ldorhfc@rwib.yvs
+                              workTelephoneNumber: '6136100284'
+          description: 200 OK Response
+        '206':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByDriverLicenseResponse
+              examples:
+                DriverLicensePartialResponse:
+                  value:
+                    summaries:
+                      - driverLicense: D4153112
+                        fault:
+                          message: Not Found
+                          errors:
+                            - messageDescription: No claims found
+                      - driverLicense: '9008469'
+                        claims:
+                          - claimNumber: 1004-53-0214
+                            dataSource: CC
+                            dateTimeOfLoss: '2021-12-01T07:00:00.000Z'
+                            status: open
+                            cause: animal
+                            openDateTime: '2022-04-13T11:21:08.996Z'
+                            reportedDateTime: '2022-04-13T11:19:37.130Z'
+                            totalPaid: 0
+                            typeOfLoss: 'N'
+                            description: Test
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            liabilityCode: C
+                            atFault: false
+                            type: AUTO
+                            policyNumber: ORSS201036249
+                            insuredVehicle:
+                              make: VOLVO
+                              model: S60
+                              manufacturedYear: '2012'
+                              serialNumber: YV1622FS2C2048448
+                              odometerReading: 0
+                              driver:
+                                name:
+                                  fullName: PPORRIDGE PEACE
+                                drivingLicenseNumber: '9008469'
+                                drivingLicenseState: OR
+                                age: '60'
+                                relationToNamedInsured: self
+                                dateTimeOfBirth: '1961-05-03T07:00:00.000Z'
+                            adjuster:
+                              name: nannann znnnann
+                              emailAddress: Cdhezzs.Ldorhfc@rwib.yvs
+                              workTelephoneNumber: '6136100284'
+          description: 206 Partial Content Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+          description: 400 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: 404 Not Found Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/loss-summaries/by-claim-number:
+    get:
+      tags:
+        - Retrieve Claim Loss Summaries By Claim Number
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: claimNumber
+          description: Claim Number
+          schema:
+            maxLength: 20
+            pattern: ^[0-9 -]{0,20}$
+            type: string
+            example: 1000-00-0034
+          in: query
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByClaimNumberResponse
+              examples:
+                RetrieveByClaimNumberResponse:
+                  value:
+                    summaries:
+                      - claimNumber: 1003-97-0445
+                        claims:
+                          - claimNumber: 1003-97-0445
+                            dataSource: CC
+                            dateTimeOfLoss: '2020-09-21T07:00:00.000Z'
+                            status: closed
+                            type: AUTO
+                            policyNumber: CAAS202590428
+                            converted: false
+                            adjuster:
+                              name: aona oannnz
+                              adjusterIdentifier: z3968
+                            policyInsureds:
+                              - fullName:
+                                  fullName: aonnna zazao
+                                address:
+                                  cityName: Redding
+                                  zipCode: 96003-7794
+                                  addressLine1: 50363 Klzqha To
+                                  isoCountryCode: US
+                                  isoRegionCode: CA
+                                  type: mailing_AAA
+                              - fullName:
+                                  fullName: nzna anazzon zazao
+                                address:
+                                  cityName: Redding
+                                  zipCode: 96003-7794
+                                  addressLine1: 44875 Fkjewu Qe
+                                  isoCountryCode: US
+                                  isoRegionCode: CA
+                                  type: mailing_AAA
+                            claimants:
+                              - name:
+                                  fullName: aonnna zazao
+                                address:
+                                  cityName: Redding
+                                  zipCode: 96003-7794
+                                  addressLine1: 50363 Klzqha To
+                                  isoCountryCode: US
+                                  isoRegionCode: CA
+                                  type: mailing_AAA
+                                involvedCoverages:
+                                  - coverageType: PAComprehensiveCov
+                                    exposure:
+                                      exposureIdentifier: cc:10865908
+                                      exposureType: VehicleDamage
+                                      exposureStatus: closed
+          description: 200 OK Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+          description: 400 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Bad Request
+                    errors:
+                      - messageDescription: Invalid Claim number
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/loss-summaries/by-policy-number:
+    get:
+      tags:
+        - Retrieve Claim Loss Summaries By Policy Number
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: policyNumber
+          description: policyNumber
+          schema:
+            maxLength: 20
+            pattern: ^[A-Z a-z 0-9]{0,20}$
+            type: string
+            example: CAAS207483283
+          in: query
+          required: true
+        - name: productType
+          description: policy type
+          schema:
+            maxLength: 4
+            pattern: ^[A-Z a-z]{0,4}$
+            type: string
+            example: PA
+            enum:
+              - PA
+              - HO
+              - PU
+          in: query
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByPolicyNumberResponse
+              examples:
+                propertyClaimResponse:
+                  value:
+                    summaries:
+                      - policyNumber: AZH4201038582
+                        claims:
+                          - claimNumber: 1004-53-2934
+                            dataSource: CC
+                            dateTimeOfLoss: '2022-07-23T07:00:00.000Z'
+                            status: open
+                            cause: water_AAA
+                            openDateTime: '2022-07-29T01:01:54.113Z'
+                            reportedDateTime: '2022-07-29T01:01:54.113Z'
+                            totalPaid: 1000
+                            typeOfLoss: PR
+                            description: Home claim
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            policyNumber: AZH4201038582
+                            isUnderSalavage: false
+                            insuredAddress:
+                              addressLine1: 5349 NORTH 48TH STREET 4
+                              cityName: SCOTTSDALE
+                              isoRegionCode: AZ
+                              zipCode: '85250'
+                            coverages:
+                              - amountPaid: 1000
+                                deductible: 0
+                                type: HOPersonalProperty_C_Contents_AAA
+                            adjuster:
+                              name: naonaana aanaoao
+                              emailAddress: Ekcrtanu.WuUnqqn@lbby.iij
+                              workTelephoneNumber: '4254067353'
+                autoClaimResponse:
+                  value:
+                    summaries:
+                      - policyNumber: OKSS201035457
+                        claims:
+                          - claimNumber: 1004-53-0076
+                            dataSource: CC
+                            dateTimeOfLoss: '2022-03-31T07:00:00.000Z'
+                            status: open
+                            cause: fire
+                            openDateTime: '2022-04-12T20:40:05.796Z'
+                            reportedDateTime: '2022-04-12T20:39:12.908Z'
+                            totalPaid: 0
+                            typeOfLoss: 'N'
+                            description: test
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            liabilityCode: C
+                            atFault: false
+                            type: AUTO
+                            policyNumber: OKSS201035457
+                            insuredVehicle:
+                              make: JEEP
+                              model: WRANGLER / TJ
+                              manufacturedYear: '2004'
+                              serialNumber: 1J4FA69S64P758219
+                              odometerReading: 0
+                              driver:
+                                name: {}
+                            adjuster:
+                              name: naoon naooaoa
+                              emailAddress: Wsgqb.Drtgwng@upng.txf
+                              workTelephoneNumber: '0436432053'
+          description: 200 OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+          description: 400 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+    post:
+      tags:
+        - Retrieve Claim Loss Summaries By Policy Number
+      parameters:
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/RetrieveClaimSummariesByPolicyNumbersRequest
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByPolicyNumberResponse
+              examples:
+                autoClaimResponse:
+                  value:
+                    summaries:
+                      - policyNumber: CAAS102080168
+                        claims:
+                          - claimNumber: 1002-28-6988
+                            dataSource: CC
+                            dateTimeOfLoss: '2017-09-11T03:45:00.000Z'
+                            status: closed
+                            cause: glassbreakage
+                            openDateTime: '2017-09-11T07:00:00.000Z'
+                            closeDateTime: '2017-11-09T15:06:00.301Z'
+                            reportedDateTime: '2017-09-11T07:00:00.000Z'
+                            totalPaid: 0
+                            typeOfLoss: AUTO
+                            description: Glass Loss
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            policyNumber: CAAS102080168
+                            isUnderSalavage: false
+                            coverages:
+                              - amountPaid: 0
+                                deductible: 0
+                                type: PAComprehensiveCov
+                            adjuster:
+                              name: aanaaaa nanann
+                              emailAddress: Vbhnmax.EmMmmf@vgsg.drw
+                              workTelephoneNumber: '2868780652'
+                          - claimNumber: 1004-44-2857
+                            dataSource: CC
+                            dateTimeOfLoss: '2021-11-05T22:30:00.000Z'
+                            status: open
+                            cause: rearEndCollision_AAA
+                            openDateTime: '2021-11-05T23:49:15.144Z'
+                            reportedDateTime: '2021-11-05T23:49:15.144Z'
+                            totalPaid: 0
+                            typeOfLoss: AUTO
+                            description: '#1 r/e #2'
+                            inSubrogation: 'N'
+                            faultPercentage: 100
+                            policyNumber: CAAS102080168
+                            isUnderSalavage: false
+                            coverages:
+                              - amountPaid: 0
+                                deductible: 0
+                                type: PACollisionCov
+                              - amountPaid: 0
+                                deductible: 0
+                                type: PAPDLiabilityVD_AAA
+                              - amountPaid: 0
+                                deductible: 0
+                                type: PABILiabilityCov_AAA
+                            adjuster:
+                              name: aonaa noooa
+                              emailAddress: Vswvw.Aphno@hnmh.dcf
+                              workTelephoneNumber: '7510877155'
+                propertyClaimResponse:
+                  value:
+                    summaries:
+                      - policyNumber: AZH4201038582
+                        claims:
+                          - claimNumber: 1004-53-2934
+                            dataSource: CC
+                            dateTimeOfLoss: '2022-07-23T07:00:00.000Z'
+                            status: open
+                            cause: water_AAA
+                            openDateTime: '2022-07-29T01:01:54.113Z'
+                            reportedDateTime: '2022-07-29T01:01:54.113Z'
+                            totalPaid: 1000
+                            typeOfLoss: PR
+                            description: Home claim
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            policyNumber: AZH4201038582
+                            isUnderSalavage: false
+                            insuredAddress:
+                              addressLine1: 5349 NORTH 48TH STREET 4
+                              cityName: SCOTTSDALE
+                              isoRegionCode: AZ
+                              zipCode: '85250'
+                            coverages:
+                              - amountPaid: 1000
+                                deductible: 0
+                                type: HOPersonalProperty_C_Contents_AAA
+                            adjuster:
+                              name: naonaana aanaoao
+                              emailAddress: Ekcrtanu.WuUnqqn@lbby.iij
+                              workTelephoneNumber: '4254067353'
+          description: 200 OK Response
+        '206':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summaries:
+                    type: array
+                    items:
+                      $ref: >-
+                        #/components/schemas/retrieveClaimSummariesByPolicyNumberResponse
+              examples:
+                PolicyNumberPartialResponse:
+                  value:
+                    summaries:
+                      - policyNumber: CAAS102080167
+                        fault:
+                          message: Not Found
+                          errors:
+                            - messageDescription: No claims found
+                      - policyNumber: AZH4201038582
+                        claims:
+                          - claimNumber: 1004-53-2934
+                            dataSource: CC
+                            dateTimeOfLoss: '2022-07-23T07:00:00.000Z'
+                            status: open
+                            cause: water_AAA
+                            openDateTime: '2022-07-29T01:01:54.113Z'
+                            reportedDateTime: '2022-07-29T01:01:54.113Z'
+                            totalPaid: 1000
+                            typeOfLoss: PR
+                            description: Home claim
+                            inSubrogation: 'N'
+                            faultPercentage: 0
+                            policyNumber: AZH4201038582
+                            isUnderSalavage: false
+                            insuredAddress:
+                              addressLine1: 5349 NORTH 48TH STREET 4
+                              cityName: SCOTTSDALE
+                              isoRegionCode: AZ
+                              zipCode: '85250'
+                            coverages:
+                              - amountPaid: 1000
+                                deductible: 0
+                                type: HOPersonalProperty_C_Contents_AAA
+                            adjuster:
+                              name: naonaana aanaoao
+                              emailAddress: Ekcrtanu.WuUnqqn@lbby.iij
+                              workTelephoneNumber: '4254067353'
+          description: 206 Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+          description: 400 Bad Request
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: '404'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/summaries/by-claim-number:
+    get:
+      tags:
+        - Retrieve Claim Summaries By Claim Number
+      parameters:
+        - name: claimNumber
+          description: claim Number
+          schema:
+            pattern: ^[0-9]{4}\b-[0-9]{2}\b-[0-9]{4}$
+          example: 1004-18-1617
+          in: query
+          required: true
+        - name: includeSupervisorDetails
+          in: query
+          description: supervisor details to be fetched ?
+          required: false
+          schema:
+            type: boolean
+            example: false
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: backEnd_env
+          in: query
+          description: Back end envinment
+          required: false
+          schema:
+            type: string
+            example: qa
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/claimSummariesResponseObject'
+              example:
+                claimsCoverageQuestions: true
+                claimAdjuster:
+                  name: Vbhnmax
+                  workTelephoneNumber: '2868780652'
+                  workTelephoneNumberExtn: '010'
+                  emailAddress: Vbhnmax.EmMmmf@vgsg.drw
+                  availability: atWork
+                  employeeStatus: ActiveworkTelephoneNumber
+                claimNumber: 1000-00-0000
+                claimStatus: closed
+                dateTimeOfLoss: '2022-11-16T10:54:01.447Z'
+                isDeductibleWaived: true
+                isFatality: true
+                isfirstPartyExposures: true
+                insuredVehicle:
+                  make: '2020'
+                  model: TOYOTA
+                  bodyType: fiber
+                  manufacturedYear: '2019'
+                  serialNumber: 5B0XW38Z26N413751
+                  odometerReading: 2000
+                  name:
+                    firstName: Jessica
+                    lastName: Peterson
+                    fullName: Jessica Peterson
+                  drivingLicenseNumber: DX89789
+                  drivingLicenseState: LA
+                  age: '2'
+                  relationToNamedInsured: ''
+                  dateTimeOfBirth: ''
+                  permissiveUse: ''
+                isUnderLitigation: true
+                lob: AUTO
+                lossDescription: Glass Loss
+                lossLocationAddress: BUTTON WILLOW, CA
+                isMajorInjury: false
+                openDateTime: '2022-11-16T10:54:01.447Z'
+                policyNumber: 5P56179
+                reportedDateTime: '2022-11-16T10:54:01.447Z'
+                isSiu: true
+                typeOfLoss: glass loss only
+                adjusterSurpervisors:
+                  - level: '01'
+                    emailID: smith.clark@contoso.com
+                    designation: Director
+          description: 200 OK Response
+        '206':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/claimSummariesResponseObject'
+              example:
+                claimsCoverageQuestions: true
+                claimAdjuster:
+                  name: Vbhnmax
+                  workTelephoneNumber: '2868780652'
+                  workTelephoneNumberExtn: '010'
+                  emailAddress: Vbhnmax.EmMmmf@vgsg.drw
+                  availability: atWork
+                  employeeStatus: Active
+                claimNumber: 1000-00-0000
+                claimStatus: closed
+                dateTimeOfLoss: '2022-11-16T10:54:01.447Z'
+                isDeductibleWaived: true
+                isFatality: true
+                isfirstPartyExposures: true
+                insuredVehicle:
+                  make: '2020'
+                  model: TOYOTA
+                  bodyType: fiber
+                  manufacturedYear: '2019'
+                  serialNumber: 5B0XW38Z26N413751
+                  odometerReading: 2000
+                  name:
+                    firstName: Jessica
+                    lastName: Peterson
+                    fullName: Jessica Peterson
+                  drivingLicenseNumber: DX89789
+                  drivingLicenseState: LA
+                  age: '2'
+                  relationToNamedInsured: ''
+                  dateTimeOfBirth: ''
+                  permissiveUse: ''
+                isUnderLitigation: true
+                lob: AUTO
+                lossDescription: Glass Loss
+                lossLocationAddress: BUTTON WILLOW, CA
+                isMajorInjury: false
+                openDateTime: '2022-11-16T10:54:01.447Z'
+                policyNumber: 5P56179
+                reportedDateTime: '2022-11-16T10:54:01.447Z'
+                isSiu: true
+                typeOfLoss: glass loss only
+                adjusterSurpervisors:
+                  message: Not Found
+                  errors:
+                    - messageDescription: No claims found
+          description: >-
+            206 Partial Response i.e. claim summary response w/o supervisor
+            details
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: 'Missing required request parameters: [claimNumber]'
+          description: 400 Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/summaries/by-policy-number:
+    get:
+      tags:
+        - Retrieve Claim Summaries By Policy Number
+      parameters:
+        - name: policyNumber
+          description: policy Number
+          schema:
+            type: string
+            pattern: ^[A-Z a-z 0-9]{0,20}$
+          example: OKSS201038449
+          in: query
+          required: true
+        - name: lob
+          description: Line Of Business
+          schema:
+            type: string
+            enum:
+              - AUTO
+              - AUTOB
+              - HO
+              - PUP
+          in: query
+          required: true
+        - name: pageOffset
+          in: query
+          description: >-
+            The offset of the first result to fetch when fetching a paginated
+            set of results, where the first result has an offset of 0. For
+            example, `pageOffset=25` will skip the first 25 results in sorted
+            order. If not specified, the default value is 0.
+          schema:
+            type: integer
+            default: 0
+            maximum: 1000
+            minimum: 0
+        - name: pageSize
+          in: query
+          description: >-
+            The maximum number of results to return in the response. For
+            example, `pageSize=10` will return first 10 results in sorted order
+          schema:
+            type: integer
+            default: 10
+            maximum: 1000
+            minimum: 1
+        - name: x-api-key
+          in: header
+          description: Unique api key for each consumer
+          required: true
+          schema:
+            type: string
+            example: 4xyz78b9-0cdc
+        - name: X-ApplicationContext
+          in: header
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+        - name: backEnd_env
+          in: query
+          description: Back end envinment
+          required: false
+          schema:
+            type: string
+            example: qa
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/claimSummariesResponse'
+              example:
+                - claimsCoverageQuestions: true
+                  claimAdjuster:
+                    name: Vbhnmax
+                    workTelephoneNumber: '2868780652'
+                    workTelephoneNumberExtn: '010'
+                    emailAddress: Vbhnmax.EmMmmf@vgsg.drw
+                    availability: atWork
+                    employeeStatus: Active
+                  claimNumber: 1000-00-0000
+                  claimStatus: closed
+                  dateTimeOfLoss: '2022-11-16T10:54:01.447Z'
+                  isDeductibleWaived: true
+                  isFatality: true
+                  isfirstPartyExposures: true
+                  insuredVehicle:
+                    make: '2020'
+                    model: TOYOTA
+                    bodyType: fiber
+                    manufacturedYear: '2019'
+                    serialNumber: 5B0XW38Z26N413751
+                    odometerReading: 2000
+                    name:
+                      firstName: Jessica
+                      lastName: Peterson
+                      fullName: Jessica Peterson
+                    drivingLicenseNumber: DX89789
+                    drivingLicenseState: LA
+                    age: '2'
+                    relationToNamedInsured: ''
+                    dateTimeOfBirth: ''
+                    permissiveUse: ''
+                  isUnderLitigation: true
+                  lob: AUTO
+                  lossDescription: Glass Loss
+                  lossLocationAddress: BUTTON WILLOW, CA
+                  isMajorInjury: false
+                  openDateTime: '2022-11-16T10:54:01.447Z'
+                  policyNumber: 5P56179
+                  reportedDateTime: '2022-11-16T10:54:01.447Z'
+                  isSiu: true
+                  typeOfLoss: glass loss only
+                  adjusterSurpervisors:
+                    - level: '01'
+                      emailID: smith.clark@contoso.com
+                      designation: Director
+          description: 200 OK Response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: 'Missing required request parameters: [claimNumber]'
+          description: 400 Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Unauthorized
+          description: 401 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No claims found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+  /api/v2/claims/adjuster/supervisors:
+    get:
+      tags:
+        - Retrieve Claim Adjuster's Supervisor Details
+      parameters:
+        - name: email_id
+          description: Unique identifier for a billing resource
+          schema:
+            type: string
+          example: john.doe@@contoso.com
+          in: query
+          required: true
+        - name: x-api-key
+          description: Unique api key for each consumer
+          schema:
+            type: string
+          example: 4xyz78b9-0cdc
+          in: header
+          required: true
+        - name: X-ApplicationContext
+          description: Application context
+          schema:
+            $ref: '#/components/schemas/ApplicationContext'
+          in: header
+          required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adjusterSurpervisors'
+              examples:
+                sample-response-1:
+                  value:
+                    - level: '01'
+                      emailID: smith.john.imidiate@contoso.com
+                      designation: Director
+                    - level: '02'
+                      emailID: smith.senior@contoso.com
+                      designation: Vice President
+                    - level: '03'
+                      emailID: smith.supersenior@contoso.com
+                      designation: President
+          description: 200 response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: 'Missing required request parameters: [emailId]'
+          description: 400 Response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Unauthorized
+          description: 401 Response
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              examples:
+                404 Response:
+                  value:
+                    message: Not Found
+                    errors:
+                      - messageDescription: No Records found
+          description: 404 Response
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fault'
+              example:
+                message: Internal Server Error
+          description: 500 Response
+components:
+  schemas:
+    ApplicationContext:
+      description: Application context
+      required:
+        - application
+        - correlationId
+      type: object
+      properties:
+        userId:
+          description: Requester Userid
+          pattern: ^[a-zA-Z0-9.-_']{0,20}$
+          type: string
+          example: es0t
+        application:
+          description: Unique ID of the consumer application.
+          pattern: ^[a-zA-Z0-9.-_']{2,30}$
+          type: string
+          example: IEWMS
+        correlationId:
+          format: uuid
+          description: Unique Id for the transaction UUID
+          type: string
+          example: f94e54f8-50a6-43e3-9c2a-c2c60b13b14d
+        subSystem:
+          description: Indicates the consumer subsystem
+          pattern: ^[a-zA-Z0-9.-_']{0,40}$
+          type: string
+          example: INSPRL
+        address:
+          description: IP address of the caller
+          pattern: ^[0-9.]{0,40}$
+          type: string
+          example: 172.29.143.200
+      additionalProperties: false
+    Fault:
+      description: Error Response from API
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          description: generic error message description.
+          type: string
+        errors:
+          type: array
+          items:
+            properties:
+              messageCode:
+                description: error code
+                pattern: ^[a-z A-Z 0-9.(),\-'_"]{0,100}$
+                type: string
+              messageDescription:
+                description: Error message in detail.
+                pattern: ^[a-z A-Z 0-9.(),\-'_"]{0,100}$
+                type: string
+              relatedAttribute:
+                description: >-
+                  attribute name that needs to be corrected in order to avoid
+                  the validation error.
+                pattern: ^[a-z A-Z 0-9.-\\-\/_]{0,40}$
+                type: string
+      additionalProperties: false
+    RetrievePredictiveClaimsRequest:
+      type: object
+      required:
+        - ani
+        - customerId
+      properties:
+        ani:
+          description: Automatic Number Identifier
+          type: string
+          pattern: ^[0-9\s\(\)\-\,]{0,15}$
+          example: (847) 847-8475,847-847-8475,8478478475
+        customerId:
+          description: Customerâ€™s unique identifier in the enterprise
+          type: string
+          pattern: ^[a-z A-Z 0-9.-\\-\/_]{0,64}$
+          example: '123456789'
+    claimsList:
+      type: array
+      items:
+        type: object
+        properties:
+          adjWorkPhone:
+            type: string
+          adjEmployeeStatus:
+            type: string
+          claimPolicyNo:
+            type: string
+          adjAvail:
+            type: string
+          adjExtension:
+            type: string
+          daysSinceOpened:
+            type: integer
+          claimLobType:
+            type: string
+          claimNumber:
+            type: string
+          claimStatus:
+            type: string
+          associatedAniNumbers:
+            type: string
+    UpdateClaimsList:
+      type: object
+      required:
+        - claimNumber
+      properties:
+        claimNumber:
+          description: claim Number Identifier
+          type: string
+          pattern: ^[0-9]{4}\b-[0-9]{2}\b-[0-9]{4}$
+          example: 1004-18-1617
+        offerStatus:
+          description: claim Number offer status
+          type: string
+          enum:
+            - ACCEPTED
+            - DECLINED
+            - 'NULL'
+          example: ACCEPTED
+    UpdatePredictiveClaimsRequest:
+      type: object
+      minProperties: 1
+      properties:
+        claimsList:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/UpdateClaimsList'
+    UpdatePredictiveClaimsResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: claim Number update request status
+          type: string
+          pattern: ^[a-zA-Z]{0,15}$
+          example: Success
+    address:
+      type: object
+      properties:
+        cityName:
+          description: city name
+          type: string
+        zipCode:
+          description: zip code
+          type: string
+        addressLine1:
+          description: street Address
+          type: string
+        addressLine2:
+          description: Extended Street Address
+          type: string
+        isoCountryCode:
+          description: Country Code in ISO standard.
+          type: string
+        isoRegionCode:
+          description: Region Code in ISO standard
+          type: string
+        type:
+          description: mailing type
+          type: string
+    policyInvolvedCoverages:
+      type: object
+      properties:
+        coverageType:
+          description: coverageType
+          type: string
+        amountPaid:
+          description: amountPaid
+          type: number
+        validatedInjury:
+          description: validatedInjury
+          type: string
+        deductible:
+          description: deductible
+          type: number
+    claimInvolvedCoverages:
+      type: object
+      properties:
+        coverageType:
+          description: coverageType
+          type: string
+        validatedInjury:
+          description: validatedInjury
+          type: string
+        exposure:
+          type: object
+          properties:
+            exposureIdentifier:
+              description: exposureIdentifier
+              type: string
+            exposureType:
+              description: exposureIdentifier
+              type: string
+            exposureStatus:
+              description: exposureIdentifier
+              type: string
+    policyInsureds:
+      type: object
+      properties:
+        name:
+          type: object
+          properties:
+            fullName:
+              description: full name
+              type: string
+        address:
+          $ref: '#/components/schemas/address'
+    insuredAddress:
+      type: object
+      properties:
+        cityName:
+          description: city name
+          type: string
+        zipCode:
+          description: zip code
+          type: string
+        addressLine1:
+          description: streetAddressLine1
+          type: string
+        addressLine2:
+          description: streetAddressLine2
+          type: string
+        isoRegionCode:
+          description: Region Code in ISO standard
+          type: string
+    Driver:
+      type: object
+      properties:
+        name:
+          type: object
+          properties:
+            firstName:
+              description: first name
+              type: string
+              pattern: >-
+                ([a-z A-Z.\-'$@©®™ŽžŸ \\u00C0-\\u00D6 \\u00D8-\\u00F6
+                \\u00F8-\\u00FF]){0,100}$
+            lastName:
+              description: last name
+              type: string
+              pattern: >-
+                ([a-z A-Z.\-'$@©®™ŽžŸ \\u00C0-\\u00D6 \\u00D8-\\u00F6
+                \\u00F8-\\u00FF]){0,100}$
+            fullName:
+              description: full name
+              type: string
+              pattern: >-
+                ([a-z A-Z.\-'$@©®™ŽžŸ \\u00C0-\\u00D6 \\u00D8-\\u00F6
+                \\u00F8-\\u00FF]){0,200}$
+        drivingLicenseNumber:
+          description: driving License Number
+          type: string
+          pattern: ^[a-z A-Z 0-9 -]{0,40}$
+        drivingLicenseState:
+          description: driving License State
+          type: string
+          pattern: ^[A-Z a-z -]{0,30}$
+        age:
+          description: drivers age
+          type: integer
+        relationToNamedInsured:
+          description: drivers relation To Named Insured
+          type: string
+          enum:
+            - Self/Insured
+            - Relative
+            - Friend
+            - Agent
+            - Attorney
+            - Employee
+            - Other
+            - Spouse
+            - Child
+            - Parent
+            - Grandparent
+            - Domestic partner
+            - Claimant
+            - Claimant's attorney
+            - Claimant's insurance co
+            - Rental representative
+            - Repair shop
+            - Driver
+            - Insurance company
+            - Injured worker
+            - Supervisor
+            - Risk Manager
+            - Medical Provider
+            - HR Representative
+            - Lienholder (Repo)
+            - Insured
+            - allrelations
+            - maincontact
+            - Public Adjuster
+        dateOfBirth:
+          description: drivers Date Of Birth
+          type: string
+          format: date
+        permissiveUse:
+          description: is driver eligible for permissiveUse
+          type: string
+          pattern: ^[a-z A-Z]{0,5}$
+    insuredVehicle:
+      type: object
+      properties:
+        make:
+          description: Vehicle Make
+          type: string
+          pattern: ^[a-zA-Z0-9]{0,30}$
+        model:
+          description: Vehicle model
+          type: string
+          pattern: ^[a-zA-Z0-9]{0,40}$
+        bodyType:
+          description: Vehicle bodyType
+          type: string
+          pattern: ^[a-zA-Z0-9]{0,40}$
+        manufacturedYear:
+          description: Vehicle manufactured Year
+          type: string
+          format: year
+        serialNumber:
+          description: Vehicle serial Number
+          type: string
+          pattern: ^[a-zA-Z0-9-_.]{0,40}$
+        odometerReading:
+          description: Vehicle odometer Reading
+          type: integer
+        driver:
+          $ref: '#/components/schemas/Driver'
+    claimants:
+      type: object
+      properties:
+        name:
+          type: object
+          properties:
+            fullName:
+              description: full name
+              type: string
+        address:
+          $ref: '#/components/schemas/address'
+        involvedCoverages:
+          type: array
+          items:
+            $ref: '#/components/schemas/claimInvolvedCoverages'
+    adjuster:
+      type: object
+      properties:
+        name:
+          description: name
+          type: string
+          pattern: >-
+            ([a-z A-Z.\-'$@©®™ŽžŸ \\u00C0-\\u00D6 \\u00D8-\\u00F6
+            \\u00F8-\\u00FF]){0,200}$
+        homeTelephoneNumber:
+          description: home telephoneNumber
+          type: string
+        mobileTelephoneNumber:
+          description: mobile Telephone number
+          type: string
+        workTelephoneNumber:
+          description: work Telephone number
+          type: string
+          pattern: ^[0-9]{0,10}$
+        workTelephoneNumberExtn:
+          description: work Telephone number extension
+          type: string
+          pattern: ^[0-9]{0,10}$
+        adjusterIdentifier:
+          description: adjusterIdentifier
+          type: string
+          pattern: ^[0-9a-zA-Z]{0,15}$
+        emailAddress:
+          description: emailAddress
+          type: string
+          pattern: >-
+            ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
+        availability:
+          description: adjuster availability
+          type: string
+          enum:
+            - atwork
+            - onvacation
+            - inactive
+        employeeStatus:
+          description: adjuster employment status
+          type: string
+          enum:
+            - Active
+            - Terminated
+            - Retired
+            - Paid LOA
+            - Unpaid LOA
+            - Deceased
+    DirverLicensesRequest:
+      title: DirverLicensesRequest
+      description: ''
+      required:
+        - licenseNumber
+      type: object
+      properties:
+        licenseNumber:
+          maxLength: 20
+          pattern: ^[A-Z a-z 0-9]{0,20}$
+          type: string
+          example: D123456
+      example:
+        licenseNumber: N4216416
+    PoliciesRequest:
+      title: PolciesRequest
+      description: ''
+      required:
+        - policyNumber
+        - productType
+      type: object
+      properties:
+        policyNumber:
+          maxLength: 20
+          pattern: ^[A-Z a-z 0-9]{0,20}$
+          type: string
+        productType:
+          maxLength: 4
+          pattern: ^[A-Z a-z]{0,4}$
+          type: string
+      example:
+        policyNumber: CAAS207483283
+        productType: PA
+    retrieveClaimSummariesByPolicyNumberResponseObject:
+      type: object
+      properties:
+        claimNumber:
+          description: claim number
+          type: string
+        dataSource:
+          description: data source
+          type: string
+        dateTimeOfLoss:
+          description: date of loss
+          type: string
+          format: date-time
+        status:
+          description: claim status
+          type: string
+        cause:
+          description: cause of incident
+          type: string
+        openDateTime:
+          description: claim open Date
+          type: string
+          format: date-time
+        closeDateTime:
+          description: claim close Date
+          type: string
+          format: date-time
+        reportedDateTime:
+          description: claim reported Date
+          type: string
+          format: date-time
+        totalPaid:
+          description: total amount paid
+          type: number
+          example: 100.6
+        typeOfLoss:
+          description: type Of Loss
+          type: string
+        description:
+          description: ''
+          type: string
+        inSubrogation:
+          description: ''
+          type: string
+        catastropheCode:
+          description: ''
+          type: string
+        faultPercentage:
+          description: ''
+          type: number
+          example: 25
+        liabilityCode:
+          description: ''
+          type: string
+        atFault:
+          description: ''
+          type: boolean
+        type:
+          description: ''
+          type: string
+        policyNumber:
+          description: ''
+          type: string
+        isUnderSalavage:
+          description: if the claim is under salvage process
+          type: boolean
+        underLyingProduct:
+          description: UnderLying Product for PU Policy
+          type: string
+          enum:
+            - auto_AAA
+            - pup_AAA
+            - motorcycle_AAA
+            - watercraft_AAA
+            - mobilehome_AAA
+            - recreationmotorveh_AAA
+            - other_AAA
+        insuredAddress:
+          $ref: '#/components/schemas/insuredAddress'
+        insuredVehicle:
+          $ref: '#/components/schemas/insuredVehicle'
+        involvedCoverages:
+          type: array
+          items:
+            $ref: '#/components/schemas/policyInvolvedCoverages'
+        adjuster:
+          $ref: '#/components/schemas/adjuster'
+    retrieveClaimSummariesByClaimNumberResponseObject:
+      type: object
+      properties:
+        claimNumber:
+          description: claim number
+          type: string
+        dataSource:
+          description: data source
+          type: string
+        dateTimeOfLoss:
+          description: date of loss
+          type: string
+          format: date-time
+        status:
+          description: claim status
+          type: string
+        cause:
+          description: cause of incident
+          type: string
+        openDateTime:
+          description: claim open Date
+          type: string
+          format: date-time
+        closeDateTime:
+          description: claim close Date
+          type: string
+          format: date-time
+        reportedDateTime:
+          description: claim reported Date
+          type: string
+          format: date-time
+        totalPaid:
+          description: total amount paid
+          type: number
+          example: 100.6
+        typeOfLoss:
+          description: type Of Loss
+          type: string
+        description:
+          description: ''
+          type: string
+        inSubrogation:
+          description: ''
+          type: string
+        catastropheCode:
+          description: ''
+          type: string
+        faultPercentage:
+          description: ''
+          type: number
+          example: 25
+        liabilityCode:
+          description: ''
+          type: string
+        atFault:
+          description: ''
+          type: boolean
+        type:
+          description: ''
+          type: string
+        policyNumber:
+          description: ''
+          type: string
+        isUnderSalavage:
+          description: if the claim is under salvage process
+          type: boolean
+        underLyingProduct:
+          description: UnderLying Product for PU Policy
+          type: string
+          enum:
+            - auto_AAA
+            - pup_AAA
+            - motorcycle_AAA
+            - watercraft_AAA
+            - mobilehome_AAA
+            - recreationmotorveh_AAA
+            - other_AAA
+        policyInsureds:
+          type: array
+          items:
+            $ref: '#/components/schemas/policyInsureds'
+        claimants:
+          type: array
+          items:
+            $ref: '#/components/schemas/claimants'
+        adjuster:
+          $ref: '#/components/schemas/adjuster'
+    RetrieveClaimSummariesByPolicyNumbersRequest:
+      description: ''
+      type: object
+      properties:
+        policies:
+          maxItems: 10
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/PoliciesRequest'
+        fromDateTime:
+          pattern: >-
+            ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+          type: string
+          example: '2021-11-11T11:01:59-07:00'
+        toDateTime:
+          pattern: >-
+            ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+          type: string
+          example: '2021-11-11T11:01:59-07:00'
+    retrieveClaimSummariesByPolicyNumberResponse:
+      properties:
+        policyNumber:
+          type: string
+        claims:
+          type: array
+          items:
+            $ref: >-
+              #/components/schemas/retrieveClaimSummariesByPolicyNumberResponseObject
+        fault:
+          $ref: '#/components/schemas/Fault'
+    retrieveClaimSummariesByClaimNumberResponse:
+      properties:
+        claimNumber:
+          type: string
+        claims:
+          type: array
+          items:
+            $ref: >-
+              #/components/schemas/retrieveClaimSummariesByClaimNumberResponseObject
+    retrieveClaimSummariesByDriverLicenseRequest:
+      title: retrieveMultiClaimSummariesRequestByDriverLicenses
+      description: ''
+      type: object
+      properties:
+        driverLicenses:
+          maxItems: 10
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/DirverLicensesRequest'
+        fromDateTime:
+          pattern: >-
+            ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+          type: string
+          example: '2021-11-11T11:01:59-07:00'
+        toDateTime:
+          pattern: >-
+            ^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])[T]([01][1-9]|[2][0-3])[:]([0-5][0-9])[:]([0-5][0-9])([+|-]([01][0-9]|[2][0-3])[:]([0-5][0-9])){0,1}$
+          type: string
+          example: '2021-11-11T11:01:59-07:00'
+    retrieveClaimSummariesByDriverLicenseResponse:
+      properties:
+        driverLicense:
+          type: string
+        claims:
+          type: array
+          items:
+            $ref: >-
+              #/components/schemas/retrieveClaimSummariesByPolicyNumberResponseObject
+        fault:
+          $ref: '#/components/schemas/Fault'
+    adjusterSurpervisors:
+      description: Supervisor info Response
+      type: array
+      items:
+        $ref: '#/components/schemas/adjusterSurpervisorInfo'
+    adjusterSurpervisorInfo:
+      type: object
+      properties:
+        level:
+          description: 01 - immediate, 02 one level up etc
+          type: string
+          enum:
+            - '01'
+            - '02'
+            - '03'
+        emailID:
+          maxLength: 100
+          pattern: >-
+            ^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$
+          type: string
+          example: smith.clark@contoso.com
+        designation:
+          maxLength: 50
+          pattern: ^[a-zA-Z0-9.\_\s-]{0,50}$
+          type: string
+          example: Director
+    claimSummariesResponseObject:
+      type: object
+      properties:
+        claimsCoverageQuestions:
+          description: >-
+            claims coverage question flag to be triggered when there is a
+            potential issue with coverage on the claim e.g. Vehicle or Driver
+            not on policy, Loss before or after policy effective dates.
+          type: boolean
+        claimAdjuster:
+          $ref: '#/components/schemas/adjuster'
+        claimNumber:
+          type: string
+          pattern: ^[0-9]{4}\b-[0-9]{2}\b-[0-9]{4}$
+        claimStatus:
+          type: string
+          enum:
+            - open
+            - closed
+            - archived
+        dateTimeOfLoss:
+          type: string
+          format: date-time
+          example: '2022-09-13T07:00:00.000Z'
+        isDeductibleWaived:
+          type: boolean
+          description: >-
+            This flag will be true for those auto claims for which Collison or
+            Comprehensive exposure exists
+        isFatality:
+          type: boolean
+        isfirstPartyExposures:
+          type: boolean
+          description: >-
+            This flag indicates whether claim has any Exposures Open or Closed
+            with these coverages:  Collision, Comprehensive, Personal Injury
+            Protection, Medical Payments, Rental Reimbursement, Transportation
+            Expense, Uninsured Motorist Bodily Injury, Uninsured Motorist
+            Property Damage, Underinsured Motorist Bodily Injury, Underinsured
+            Motorist Property Damage
+        insuredVehicle:
+          $ref: '#/components/schemas/insuredVehicle'
+        isUnderLitigation:
+          type: boolean
+          description: litigation Flag to be triggered when legal matter is opened on claim
+        lob:
+          type: string
+          description: line of business
+          enum:
+            - AUTO
+            - AUTOB
+            - HO
+            - PUP
+        lossDescription:
+          type: string
+          description: A description of the accident or loss
+          minLength: 1
+          maxLength: 1333
+          pattern: \S
+        lossLocationAddress:
+          type: string
+          description: accident/loss site details
+          maxLength: 255
+          pattern: ^[A-Z a-z 0-9 "\\/():,.#*$%^'&\_-]{0,255}$
+        isMajorInjury:
+          type: boolean
+        openDateTime:
+          type: string
+          format: date-time
+          example: '2022-09-27T21:29:21.148Z'
+        policyNumber:
+          type: string
+          pattern: ^[0-9a-zA-Z-_]{1,25}$
+        reportedDateTime:
+          type: string
+          format: date-time
+          example: '2022-09-27T21:27:02.214Z'
+        isSiu:
+          type: boolean
+          description: >-
+            Special Investigations Unit flag to be triggered when Siu fraud
+            score indicates review or referred to isSiu by user
+        typeOfLoss:
+          type: string
+          pattern: ^[a-zA-Z0-9-_.,'"\s()/\\:&#]{0,255}$
+        adjusterSurpervisors:
+          description: Supervisor info Response
+          type: array
+          items:
+            $ref: '#/components/schemas/adjusterSurpervisorInfo'
+    claimSummariesResponse:
+      description: Supervisors info Response
+      type: array
+      items:
+        $ref: '#/components/schemas/claimSummariesResponseObject'
